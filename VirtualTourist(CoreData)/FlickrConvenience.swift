@@ -18,7 +18,7 @@ extension FlickrClient {
                 print(error)
                 convenienceMethodForGetPhotos(false, error)
             }else {
-                Constants.FlickrUsables.photosArray = returnedPhotos
+                Constants.FlickrUsables.photosArray = returnedPhotos 
                 convenienceMethodForGetPhotos(true, "")
             }
         }

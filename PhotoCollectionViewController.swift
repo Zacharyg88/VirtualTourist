@@ -18,7 +18,16 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     @IBOutlet weak var mapView:MKMapView! // = MKMapView()
     @IBOutlet weak var photoCollectionView:UICollectionView!
     @IBOutlet weak var collectionViewFlowLayout: UICollectionViewFlowLayout!
+    @IBOutlet weak var backButton: UIBarButtonItem!
+    @IBOutlet weak var deleteButton: UIBarButtonItem!
 
+
+    @IBAction func dismissPhotoCollectionViewController(_ sender: Any) {
+        self.dismiss(animated: true) {
+            FlickrClient.Constants.FlickrUsables.currentPin = Pin()
+            FlickrClient.Constants.FlickrUsables.photosArray = []
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()        
@@ -71,8 +80,13 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        print(FlickrClient.Constants.FlickrUsables.currentPin.photo?.allObjects.count)
+        
+        
         return (FlickrClient.Constants.FlickrUsables.currentPin.photo?.allObjects.count)!
     }
+    
+ 
     
     
     

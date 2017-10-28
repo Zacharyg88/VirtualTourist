@@ -19,7 +19,7 @@ import CoreData
 
 class FlickrClient: NSObject {
     
-    func searchFlickrByLocation(lat: Float, lon: Float, completionHandlerForSearchFlickerByLocation: @escaping (_ results:[[String: AnyObject]], _ errorString: String) -> Void) {
+    func searchFlickrByLocation(lat: Float, lon: Float, completionHandlerForSearchFlickerByLocation: @escaping (_ results:[Photo], _ errorString: String) -> Void) {
         let methodParameters = [
             Constants.FlickrKeys.safeSearch: Constants.FlickerValues.useSafeSearch,
             Constants.FlickrKeys.boundingBox: bboxString(lat: lat, lon: lon),
@@ -43,10 +43,11 @@ class FlickrClient: NSObject {
         return "\(minimumLon),\(minimumLat),\(maximumLon),\(maximumLat)"
     }
     
-    func getImagesFromLocationSearch(_ methodParameters: [String: AnyObject]) -> [[String: AnyObject]] {
+    func getImagesFromLocationSearch(_ methodParameters: [String: AnyObject]) -> [Photo] {
         let session = URLSession.shared
         let request = URLRequest(url: flickrURLFromParameters(methodParameters))
-        var results = [[String: AnyObject]]()
+        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        var results = [Photo]()
         let task = session.dataTask(with: request) { (data, response, error) in
             if error != nil {
                 print("There was an error! \(error)")
@@ -60,15 +61,15 @@ class FlickrClient: NSObject {
                 }
                 let photos = parsedResults["photos"] as! [String: AnyObject]
                 let photoArray = photos["photo"] as! [[String: AnyObject]]
-                results = photoArray
-//                for photo in photoArray {
-//                    let farm = String(describing: photo["farm"]!)
-//                    let id = photo["id"] as! String
-//                    let server = photo["server"] as! String
-//                    let secret = photo["secret"] as! String
-//                    let photoURL = URL(string: "https://farm\(farm).staticflickr.com/\(server)/\(id)_\(secret).jpg")
-//                    let newPhoto = Photo(id: (Double(id)!), title: photo["title"] as! String, pin:  (FlickrClient.Constants.FlickrUsables.currentPin) , context: context)
-//                }
+                for photo in photoArray {
+                    let farm = String(describing: photo["farm"]!)
+                    let id = photo["id"] as! String
+                    let server = photo["server"] as! String
+                    let secret = photo["secret"] as! String
+                    let photoURL = "https://farm\(farm).staticflickr.com/\(server)/\(id)_\(secret).jpg"
+                   let newPhoto = Photo.init(id: (Double(id))!, imageURL: photoURL, title: photo["title"] as! String, pin: FlickrClient.Constants.FlickrUsables.currentPin, context: context)
+                    results.append(newPhoto)
+                }
             }
         }
         task.resume()
