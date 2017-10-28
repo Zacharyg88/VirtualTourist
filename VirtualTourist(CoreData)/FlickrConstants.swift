@@ -60,7 +60,7 @@ extension FlickrClient {
             
         }
         struct FlickrUsables {
-            static var photosDictionary = [String: AnyObject]()
+            static var photosArray = [[String: AnyObject]]()
             static var currentPinLat = Float()
             static var currentPinLon = Float()
             static var currentPin = Pin()

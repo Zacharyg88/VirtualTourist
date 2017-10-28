@@ -48,7 +48,6 @@ class mapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
             }
             return pinView
         }
-        
     }
     
     func addPinsFromConstants() {
@@ -65,10 +64,7 @@ class mapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         }catch {
             print("There was an error adding pins \(error)")
         }
-        
     }
-    
-    
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         let center = mapView.centerCoordinate
         let zoom = mapView.camera.altitude
@@ -84,8 +80,11 @@ class mapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         let newCoordinate = self.mapView?.convert(coordinate, toCoordinateFrom: self.mapView)
         annotation.coordinate = newCoordinate!
         self.mapView?.addAnnotation(annotation)
+        
+        if gestureRecognizer.state == UIGestureRecognizerState.ended {
         let newPin = Pin(latitude: Float(annotation.coordinate.latitude), longitude: Float(annotation.coordinate.longitude), context: context)
         print(newPin)
+        }
         
     }
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -95,40 +94,33 @@ class mapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         print(error)
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-        var currentPin = Pin()
+        var currentPin:Pin?
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
         do {
-            let fetchedPin = try context.fetch(fetchRequest)
+            let fetchedPin = try! context.fetch(fetchRequest)
             for pin in fetchedPin {
                 if (pin as! Pin).latitude == Float((view.annotation?.coordinate.latitude)!) && (pin as! Pin).longitude == Float((view.annotation?.coordinate.longitude)!) {
                     currentPin = pin as! Pin
                 }
             }
-        }catch {
-            print(error)
-        }
-        if (currentPin.photo?.count)! > 0 {
-            FlickrClient.Constants.FlickrUsables.currentPin = currentPin
-            performSegue(withIdentifier: "showCollectionViewController", sender: nil)
-            
-            
-            
-        }else {
-            FlickrClient.sharedInstance().getPhotosFromFlickr(lat: Float((view.annotation?.coordinate.latitude)!), lon: Float((view.annotation?.coordinate.longitude)!)) { (success, error) in
-                if success != true {
-                    print(error)
-                }else {
-                    UserDefaults.standard.set(true, forKey: "pin\(currentPin.objectID)HasPhotos")
-                    print("success!")
-                }
+            if currentPin != nil {
                 
+                if (currentPin!.photo?.count)! > 0 {
+                    FlickrClient.Constants.FlickrUsables.currentPin = currentPin!
+                    self.performSegue(withIdentifier: "showCollectionViewController", sender: nil)
+                } else {
+                    FlickrClient.sharedInstance().getPhotosFromFlickr(lat: Float((view.annotation?.coordinate.latitude)!), lon: Float((view.annotation?.coordinate.longitude)!)) { (success, error) in
+                        if success != true {
+                            print(error)
+                        }else {
+                            print("success!")
+                            FlickrClient.Constants.FlickrUsables.currentPin = currentPin!
+                            self.performSegue(withIdentifier: "showCollectionViewController", sender: nil)
+                        }
+                    }
+                }
             }
         }
     }

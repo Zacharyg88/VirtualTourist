@@ -12,24 +12,16 @@ import MapKit
 
 class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
     
-    @IBOutlet weak var mapView = MKMapView()
-    @IBOutlet weak var photoCollectionView = UICollectionView()
-
+    
+    
+    
+    @IBOutlet weak var mapView:MKMapView! // = MKMapView()
+    @IBOutlet weak var photoCollectionView:UICollectionView!
+    @IBOutlet weak var collectionViewFlowLayout: UICollectionViewFlowLayout!
 
     
     override func viewDidLoad() {
-        super.viewDidLoad()
-        // CollectionView Setup
-        let layout = UICollectionViewFlowLayout()
-        layout.sectionInset = UIEdgeInsets(top: 20, left: 10, bottom: 10, right: 10)
-        layout.itemSize = CGSize(width: 111, height: 111)
-        let pCollectionView = UICollectionView(frame: self.view.frame, collectionViewLayout: layout)
-        pCollectionView.delegate = self
-        pCollectionView.dataSource = self
-        pCollectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
-        view.addSubview(pCollectionView)
-        
-        self.photoCollectionView?.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        super.viewDidLoad()        
         photoCollectionView?.delegate = self
         
         // Map Setup
@@ -62,6 +54,16 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
         let cell = photoCollectionView?.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! photoCollectionViewCell
         let photos = [(FlickrClient.Constants.FlickrUsables.currentPin.photo?.allObjects)]
         let photo = photos[(indexPath as IndexPath).row]
+        //photo without image data 
+        
+        
+        // activity indicator 
+        
+        // urlsession.datatask -> URL
+        
+        // data -> 1. photo.imagedata = data
+        // UIIMage (data ) - cell.imageview.image = image
+        
         print(photo)
         
         return cell
