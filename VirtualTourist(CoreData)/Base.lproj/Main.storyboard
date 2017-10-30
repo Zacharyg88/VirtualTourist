@@ -95,8 +95,16 @@
                                                     <rect key="frame" x="0.0" y="0.0" width="126" height="116"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 </imageView>
+                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="zHY-yT-cdP">
+                                                    <rect key="frame" x="53" y="43" width="20" height="20"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                </activityIndicatorView>
                                             </subviews>
                                         </view>
+                                        <connections>
+                                            <outlet property="photoActivityIndicator" destination="zHY-yT-cdP" id="mRm-Jo-wg2"/>
+                                            <outlet property="photoImageView" destination="7qf-yh-HUO" id="VFu-Bn-8Xt"/>
+                                        </connections>
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>

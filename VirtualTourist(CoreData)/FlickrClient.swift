@@ -29,7 +29,10 @@ class FlickrClient: NSObject {
             Constants.FlickrKeys.noJSONCallback: Constants.FlickerValues.disableJSONCallback
         ]
         let results = getImagesFromLocationSearch(methodParameters as [String : AnyObject])
+        print(results)
+        if results != [] {
         completionHandlerForSearchFlickerByLocation(results, "")
+        }
     
     
     }
@@ -61,6 +64,8 @@ class FlickrClient: NSObject {
                 }
                 let photos = parsedResults["photos"] as! [String: AnyObject]
                 let photoArray = photos["photo"] as! [[String: AnyObject]]
+                print(photoArray)
+                
                 for photo in photoArray {
                     let farm = String(describing: photo["farm"]!)
                     let id = photo["id"] as! String
