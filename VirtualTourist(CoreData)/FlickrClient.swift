@@ -18,8 +18,14 @@ import UIKit
 import CoreData
 
 class FlickrClient: NSObject {
+    var currentPinID = NSManagedObjectID()
+    var currentPinLat = Float()
+    var currentPinLon = Float()
+
     
     func searchFlickrByLocation(lat: Float, lon: Float, completionHandlerForSearchFlickerByLocation: @escaping (_ results:[Photo], _ errorString: String) -> Void) {
+        self.currentPinLat = lat
+        self.currentPinLon = lon
         let methodParameters = [
             Constants.FlickrKeys.safeSearch: Constants.FlickerValues.useSafeSearch,
             Constants.FlickrKeys.boundingBox: bboxString(lat: lat, lon: lon),
@@ -31,13 +37,9 @@ class FlickrClient: NSObject {
         let results = getImagesFromLocationSearch(methodParameters as [String : AnyObject])
         print(results)
         if results != [] {
-        completionHandlerForSearchFlickerByLocation(results, "")
+            completionHandlerForSearchFlickerByLocation(results, "")
         }
-    
-    
     }
-    
-    
     func bboxString(lat: Float, lon: Float) -> String {
         let minimumLon = max(lon - Constants.Flickr.bboxHalfWidth, Float(Constants.Flickr.SearchLonRange.0))
         let minimumLat = max(lat - Constants.Flickr.bboxHalfHeight, Float(Constants.Flickr.SearchLatRange.0))
@@ -65,15 +67,20 @@ class FlickrClient: NSObject {
                 let photos = parsedResults["photos"] as! [String: AnyObject]
                 let photoArray = photos["photo"] as! [[String: AnyObject]]
                 print(photoArray)
-                
+                self.getCDPins()
+
                 for photo in photoArray {
-                    let farm = String(describing: photo["farm"]!)
-                    let id = photo["id"] as! String
-                    let server = photo["server"] as! String
-                    let secret = photo["secret"] as! String
-                    let photoURL = "https://farm\(farm).staticflickr.com/\(server)/\(id)_\(secret).jpg"
-                   let newPhoto = Photo.init(id: (Double(id))!, imageURL: photoURL, title: photo["title"] as! String, pin: FlickrClient.Constants.FlickrUsables.currentPin, context: context)
-                    results.append(newPhoto)
+                    context.perform {
+                        let currentPinID = context.object(with: self.currentPinID)
+                        
+                        let farm = String(describing: photo["farm"]!)
+                        let id = photo["id"] as! String
+                        let server = photo["server"] as! String
+                        let secret = photo["secret"] as! String
+                        let photoURL = "https://farm\(farm).staticflickr.com/\(server)/\(id)_\(secret).jpg"
+                        let newPhoto = Photo.init(id: (Double(id))!, imageURL: photoURL, title: photo["title"] as! String, pin: currentPinID as! Pin, context: context)
+                        results.append(newPhoto)
+                    }
                 }
             }
         }
@@ -82,7 +89,6 @@ class FlickrClient: NSObject {
     }
     
     func flickrURLFromParameters(_ parameters: [String:AnyObject]) -> URL {
-        
         var components = URLComponents()
         components.scheme = Constants.Flickr.APIScheme
         components.host = Constants.Flickr.APIHost
@@ -93,7 +99,6 @@ class FlickrClient: NSObject {
             let queryItem = URLQueryItem(name: key, value: "\(value)")
             components.queryItems!.append(queryItem)
         }
-        
         return components.url!
     }
     
@@ -102,6 +107,20 @@ class FlickrClient: NSObject {
             static var sharedInstance = FlickrClient()
         }
         return Singleton.sharedInstance
+    }
+    
+    func getCDPins() {
+        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
+        let requestResults = try! context.fetch(request) as! [Pin]
+        for result in requestResults {
+            let lat = Float(result.latitude)
+            let lon = Float(result.longitude)
+            
+            if lat == currentPinLat && lon == currentPinLon {
+                self.currentPinID = result.objectID
+            }
+        }
     }
     
 }

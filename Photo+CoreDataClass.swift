@@ -22,5 +22,4 @@ public class Photo: NSManagedObject {
             self.init(context: context)
         }
     }
-    
-}
+} 
