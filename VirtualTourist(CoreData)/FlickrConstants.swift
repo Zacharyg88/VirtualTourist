@@ -64,6 +64,7 @@ extension FlickrClient {
             static var currentPinLat = Float()
             static var currentPinLon = Float()
             static var currentPin = Pin()
+            static var noPhotosBool = Bool()
         }
         
     }

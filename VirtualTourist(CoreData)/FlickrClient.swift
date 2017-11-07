@@ -21,11 +21,9 @@ class FlickrClient: NSObject {
     var currentPinID = NSManagedObjectID()
     var currentPinLat = Float()
     var currentPinLon = Float()
-
     
-    func searchFlickrByLocation(lat: Float, lon: Float, completionHandlerForSearchFlickerByLocation: @escaping (_ results:[Photo], _ errorString: String) -> Void) {
-        self.currentPinLat = lat
-        self.currentPinLon = lon
+    
+    func searchFlickrByLocation(lat: Float, lon: Float, completionHandlerForSearchFlickerByLocation: @escaping (_ success: Bool,_ results: [Photo], _ errorString: String) -> Void) {
         let methodParameters = [
             Constants.FlickrKeys.safeSearch: Constants.FlickerValues.useSafeSearch,
             Constants.FlickrKeys.boundingBox: bboxString(lat: lat, lon: lon),
@@ -34,10 +32,10 @@ class FlickrClient: NSObject {
             Constants.FlickrKeys.method: Constants.FlickerValues.searchMethod,
             Constants.FlickrKeys.noJSONCallback: Constants.FlickerValues.disableJSONCallback
         ]
-        let results = getImagesFromLocationSearch(methodParameters as [String : AnyObject])
-        print(results)
-        if results != [] {
-            completionHandlerForSearchFlickerByLocation(results, "")
+        getImagesFromLocationSearch(methodParameters as [String : AnyObject]) { (success, results) in
+            if success == true {
+                completionHandlerForSearchFlickerByLocation(true, results, "")
+            }
         }
     }
     func bboxString(lat: Float, lon: Float) -> String {
@@ -48,11 +46,11 @@ class FlickrClient: NSObject {
         return "\(minimumLon),\(minimumLat),\(maximumLon),\(maximumLat)"
     }
     
-    func getImagesFromLocationSearch(_ methodParameters: [String: AnyObject]) -> [Photo] {
+    func getImagesFromLocationSearch(_ methodParameters: [String: AnyObject], completionHandlerForGetImagesFromLocationSearch: @escaping (_ success: Bool,_ results: [Photo] ) -> Void) {
         let session = URLSession.shared
+        var results = [Photo]()
         let request = URLRequest(url: flickrURLFromParameters(methodParameters))
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        var results = [Photo]()
         let task = session.dataTask(with: request) { (data, response, error) in
             if error != nil {
                 print("There was an error! \(error)")
@@ -60,15 +58,11 @@ class FlickrClient: NSObject {
                 var parsedResults = [String: AnyObject]()
                 do{
                     parsedResults = try! JSONSerialization.jsonObject(with: data!, options: .allowFragments) as! [String: AnyObject]
-                }catch {
-                    print("There was an Error parsing the JSON Data")
-                    return
                 }
                 let photos = parsedResults["photos"] as! [String: AnyObject]
                 let photoArray = photos["photo"] as! [[String: AnyObject]]
-                print(photoArray)
                 self.getCDPins()
-
+                
                 for photo in photoArray {
                     context.perform {
                         let currentPinID = context.object(with: self.currentPinID)
@@ -80,12 +74,15 @@ class FlickrClient: NSObject {
                         let photoURL = "https://farm\(farm).staticflickr.com/\(server)/\(id)_\(secret).jpg"
                         let newPhoto = Photo.init(id: (Double(id))!, imageURL: photoURL, title: photo["title"] as! String, pin: currentPinID as! Pin, context: context)
                         results.append(newPhoto)
+                        FlickrClient.Constants.FlickrUsables.photosArray.append(newPhoto)
                     }
                 }
             }
         }
         task.resume()
-        return results
+    
+        completionHandlerForGetImagesFromLocationSearch(true, results)
+        
     }
     
     func flickrURLFromParameters(_ parameters: [String:AnyObject]) -> URL {
@@ -110,6 +107,7 @@ class FlickrClient: NSObject {
     }
     
     func getCDPins() {
+        
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
         let requestResults = try! context.fetch(request) as! [Pin]
@@ -117,8 +115,10 @@ class FlickrClient: NSObject {
             let lat = Float(result.latitude)
             let lon = Float(result.longitude)
             
-            if lat == currentPinLat && lon == currentPinLon {
+            if lat == FlickrClient.Constants.FlickrUsables.currentPin.latitude && lon == FlickrClient.Constants.FlickrUsables.currentPin.longitude {
                 self.currentPinID = result.objectID
+                print(self.currentPinID)
+                
             }
         }
     }

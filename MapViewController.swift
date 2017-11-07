@@ -46,6 +46,7 @@ class mapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
             else {
                 pinView!.annotation = annotation
             }
+            
             return pinView
         }
     }
@@ -82,11 +83,38 @@ class mapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         self.mapView?.addAnnotation(annotation)
         
         if gestureRecognizer.state == UIGestureRecognizerState.ended {
-        let newPin = Pin(latitude: Float(annotation.coordinate.latitude), longitude: Float(annotation.coordinate.longitude), context: context)
-        print(newPin)
+            let newPin = Pin(latitude: Float(annotation.coordinate.latitude), longitude: Float(annotation.coordinate.longitude), context: context)
+            var currentPin:Pin?
+            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
+            do {
+                let fetchedPin = try! context.fetch(fetchRequest)
+                for pin in fetchedPin {
+                    if (pin as! Pin).latitude == Float(newPin.latitude) && (pin as! Pin).longitude == Float(newPin.longitude) {
+                        currentPin = pin as? Pin
+                    }
+                }
+            }
+            if currentPin != nil {
+                if (currentPin!.photo?.count)! > 0 {
+                    FlickrClient.Constants.FlickrUsables.currentPin = currentPin!
+                } else {
+                    FlickrClient.sharedInstance().getPhotosFromFlickr(lat: Float(newPin.latitude), lon: Float(newPin.longitude)) { (success, errorString) in
+                        
+                        if success != true {
+                            print(errorString)
+                        }else {
+                            
+                            print("success!")
+                            print(FlickrClient.Constants.FlickrUsables.photosArray.count)
+                            FlickrClient.Constants.FlickrUsables.currentPin = currentPin!
+                        }
+                    }
+                }
+            }
         }
-        
     }
+    
+    
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         print(locations)
     }
@@ -105,20 +133,24 @@ class mapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
                     currentPin = pin as! Pin
                 }
             }
-            if currentPin != nil {
-                
-                if (currentPin!.photo?.count)! > 0 {
-                    FlickrClient.Constants.FlickrUsables.currentPin = currentPin!
-                    self.performSegue(withIdentifier: "showCollectionViewController", sender: nil)
-                } else {
-                    FlickrClient.sharedInstance().getPhotosFromFlickr(lat: Float((view.annotation?.coordinate.latitude)!), lon: Float((view.annotation?.coordinate.longitude)!)) { (success, error) in
-                        if success != true {
-                            print(error)
-                        }else {
-                            print("success!")
-                            FlickrClient.Constants.FlickrUsables.currentPin = currentPin!
-                            self.performSegue(withIdentifier: "showCollectionViewController", sender: nil)
-                        }
+        }
+        
+        if currentPin != nil {
+            if (currentPin!.photo?.count)! > 0 {
+                FlickrClient.Constants.FlickrUsables.currentPin = currentPin!
+                performSegue(withIdentifier: "showCollectionViewController", sender: nil)
+            } else {
+                FlickrClient.sharedInstance().getPhotosFromFlickr(lat: Float((view.annotation?.coordinate.latitude)!), lon: Float((view.annotation?.coordinate.longitude)!)) { (success, errorString) in
+                    
+                    if success != true {
+                        print(errorString)
+                    }else {
+                        
+                        print("success!")
+                        print(FlickrClient.Constants.FlickrUsables.photosArray.count)
+                        
+                        FlickrClient.Constants.FlickrUsables.currentPin = currentPin!
+                        self.performSegue(withIdentifier: "showCollectionViewController", sender: nil)
                     }
                 }
             }

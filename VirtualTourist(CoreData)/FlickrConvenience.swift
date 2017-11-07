@@ -13,14 +13,16 @@ extension FlickrClient {
     func getPhotosFromFlickr(lat: Float, lon: Float, convenienceMethodForGetPhotos: @escaping (_ success: Bool, _ errorString: String) -> Void) {
         
         
-        FlickrClient.sharedInstance().searchFlickrByLocation(lat: lat, lon: lon) { (returnedPhotos, error) in
+        FlickrClient.sharedInstance().searchFlickrByLocation(lat: lat, lon: lon) { (success, results, error) in
             if error != "" {
                 print(error)
                 convenienceMethodForGetPhotos(false, error)
             }else {
-                print(returnedPhotos)
-                
-                Constants.FlickrUsables.photosArray = returnedPhotos
+                if results.count == 0 {
+                    FlickrClient.Constants.FlickrUsables.noPhotosBool = true
+                    convenienceMethodForGetPhotos(true, "no photos")
+                }
+                FlickrClient.Constants.FlickrUsables.photosArray = results
                 convenienceMethodForGetPhotos(true, "")
             }
         }

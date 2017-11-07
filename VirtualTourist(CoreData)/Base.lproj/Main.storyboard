@@ -64,20 +64,24 @@
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <items>
-                                    <navigationItem title="Title" id="g6T-7a-Pnx">
+                                    <navigationItem id="g6T-7a-Pnx">
                                         <barButtonItem key="leftBarButtonItem" title="Back" id="pFc-Yl-Cmj">
                                             <connections>
                                                 <action selector="dismissPhotoCollectionViewController:" destination="fXH-ug-9fD" id="Fl4-Qn-fid"/>
                                             </connections>
                                         </barButtonItem>
-                                        <barButtonItem key="rightBarButtonItem" title="Delete" id="QUp-bf-nbC"/>
+                                        <barButtonItem key="rightBarButtonItem" title="Delete" id="QUp-bf-nbC">
+                                            <connections>
+                                                <action selector="deletePhotos:" destination="fXH-ug-9fD" id="Tt9-oJ-Rvb"/>
+                                            </connections>
+                                        </barButtonItem>
                                     </navigationItem>
                                 </items>
                             </navigationBar>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Taa-M5-Vd8">
                                 <rect key="frame" x="0.0" y="233" width="375" height="434"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Sqt-2J-xjy">
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="5" minimumInteritemSpacing="5" id="Sqt-2J-xjy">
                                     <size key="itemSize" width="126" height="107"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
@@ -130,7 +134,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Pnj-Zp-BWI" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1402" y="122"/>
+            <point key="canvasLocation" x="1400.8" y="121.88905547226388"/>
         </scene>
     </scenes>
 </document>

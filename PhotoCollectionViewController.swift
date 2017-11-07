@@ -26,6 +26,28 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
             FlickrClient.Constants.FlickrUsables.photosArray = []
         }
     }
+    
+    @IBAction func deletePhotos(_ sender: Any) {
+        var pinID = NSManagedObjectID()
+        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        let photoFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
+        let pinFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
+        let fetchedPhotos = try! context.fetch(photoFetchRequest) as! [Photo]
+        let fetchedPins = try! context.fetch(pinFetchRequest) as! [Pin]
+        for pin in fetchedPins {
+            if pin.latitude == Float(self.mapView.centerCoordinate.latitude) && pin.longitude == Float(self.mapView.centerCoordinate.longitude) {
+                pinID = pin.objectID
+            }
+        }
+        for photo in fetchedPhotos {
+            if photo.pin?.objectID == pinID {
+                context.delete(photo)
+            }
+        }
+        self.dismiss(animated: true, completion: nil)
+        
+    }
+    
     override func viewDidLoad() {
         
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
@@ -48,10 +70,9 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
         
         photoCollectionView?.delegate = self
         photoCollectionView?.dataSource = self
-        print(photosArray)
         
         // Map Setup
-        self.mapView?.camera.altitude = CLLocationDistance(UserDefaults.standard.float(forKey: "mapZoom"))
+        self.mapView?.camera.altitude = CLLocationDistance(12000)
         self.mapView?.centerCoordinate = CLLocationCoordinate2D(latitude: CLLocationDegrees(FlickrClient.Constants.FlickrUsables.currentPin.latitude), longitude: CLLocationDegrees(FlickrClient.Constants.FlickrUsables.currentPin.longitude))
         let currentPinAnnotation = MKPointAnnotation()
         currentPinAnnotation.coordinate.latitude = CLLocationDegrees(FlickrClient.Constants.FlickrUsables.currentPin.latitude)
