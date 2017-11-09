@@ -60,9 +60,8 @@
                                     <constraint firstAttribute="height" constant="191" id="bF2-yI-MCT"/>
                                 </constraints>
                             </mapView>
-                            <navigationBar contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="RxC-TQ-Cor">
+                            <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="RxC-TQ-Cor">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <items>
                                     <navigationItem id="g6T-7a-Pnx">
                                         <barButtonItem key="leftBarButtonItem" title="Back" id="pFc-Yl-Cmj">
@@ -70,7 +69,7 @@
                                                 <action selector="dismissPhotoCollectionViewController:" destination="fXH-ug-9fD" id="Fl4-Qn-fid"/>
                                             </connections>
                                         </barButtonItem>
-                                        <barButtonItem key="rightBarButtonItem" title="Delete" id="QUp-bf-nbC">
+                                        <barButtonItem key="rightBarButtonItem" title="New Collection" id="QUp-bf-nbC">
                                             <connections>
                                                 <action selector="deletePhotos:" destination="fXH-ug-9fD" id="Tt9-oJ-Rvb"/>
                                             </connections>
@@ -95,16 +94,22 @@
                                             <rect key="frame" x="0.0" y="0.0" width="126" height="107"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7qf-yh-HUO">
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="7qf-yh-HUO">
                                                     <rect key="frame" x="0.0" y="0.0" width="126" height="116"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 </imageView>
-                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="zHY-yT-cdP">
+                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="zHY-yT-cdP">
                                                     <rect key="frame" x="53" y="43" width="20" height="20"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 </activityIndicatorView>
                                             </subviews>
                                         </view>
+                                        <constraints>
+                                            <constraint firstAttribute="bottomMargin" secondItem="7qf-yh-HUO" secondAttribute="bottom" constant="-17" id="3dN-NL-kXe"/>
+                                            <constraint firstItem="7qf-yh-HUO" firstAttribute="centerX" secondItem="zHY-yT-cdP" secondAttribute="centerX" id="aOG-QD-oWk"/>
+                                            <constraint firstItem="zHY-yT-cdP" firstAttribute="centerY" secondItem="R4a-B2-4Pa" secondAttribute="centerY" id="bKx-EE-BJe"/>
+                                            <constraint firstAttribute="trailing" secondItem="7qf-yh-HUO" secondAttribute="trailing" id="bN1-Ir-Ctc"/>
+                                            <constraint firstItem="7qf-yh-HUO" firstAttribute="leading" secondItem="R4a-B2-4Pa" secondAttribute="leading" id="sbS-oN-odg"/>
+                                            <constraint firstItem="7qf-yh-HUO" firstAttribute="top" secondItem="R4a-B2-4Pa" secondAttribute="top" id="yXy-Ee-McF"/>
+                                        </constraints>
                                         <connections>
                                             <outlet property="photoActivityIndicator" destination="zHY-yT-cdP" id="mRm-Jo-wg2"/>
                                             <outlet property="photoImageView" destination="7qf-yh-HUO" id="VFu-Bn-8Xt"/>
@@ -112,16 +117,43 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="O2i-In-7vC">
+                                <rect key="frame" x="0.0" y="233" width="375" height="434"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No Photos Found" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Dc5-D8-l2B">
+                                        <rect key="frame" x="105" y="159" width="166" height="117"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="117" id="d0O-RG-Quf"/>
+                                            <constraint firstAttribute="width" constant="166" id="ygh-7t-7MC"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstItem="Dc5-D8-l2B" firstAttribute="top" secondItem="O2i-In-7vC" secondAttribute="top" constant="159" id="H32-or-tjS"/>
+                                    <constraint firstItem="Dc5-D8-l2B" firstAttribute="centerX" secondItem="O2i-In-7vC" secondAttribute="centerX" id="wR6-4e-heU"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="Taa-M5-Vd8" secondAttribute="trailing" id="45I-7r-aY1"/>
+                            <constraint firstItem="O2i-In-7vC" firstAttribute="top" secondItem="RxC-TQ-Cor" secondAttribute="bottom" constant="189" id="96C-z4-Q5V"/>
                             <constraint firstItem="Taa-M5-Vd8" firstAttribute="top" secondItem="zv1-q9-c0X" secondAttribute="bottom" constant="-2" id="9IL-aV-fC9"/>
                             <constraint firstItem="0cg-KZ-lJT" firstAttribute="top" secondItem="Taa-M5-Vd8" secondAttribute="bottom" id="9b3-Hi-BW9"/>
                             <constraint firstItem="zv1-q9-c0X" firstAttribute="top" secondItem="HxQ-iQ-9zi" secondAttribute="bottom" constant="24" id="Lw2-qd-Yth"/>
+                            <constraint firstItem="0cg-KZ-lJT" firstAttribute="top" secondItem="O2i-In-7vC" secondAttribute="bottom" id="O2E-Q8-CeT"/>
+                            <constraint firstItem="O2i-In-7vC" firstAttribute="leading" secondItem="v96-Rh-U1A" secondAttribute="leading" id="Oix-JW-YvF"/>
                             <constraint firstItem="Taa-M5-Vd8" firstAttribute="leading" secondItem="v96-Rh-U1A" secondAttribute="leading" id="Qu6-IO-dPh"/>
                             <constraint firstAttribute="trailing" secondItem="zv1-q9-c0X" secondAttribute="trailing" id="URc-qg-FSM"/>
                             <constraint firstItem="zv1-q9-c0X" firstAttribute="leading" secondItem="v96-Rh-U1A" secondAttribute="leading" id="Xtu-FV-0kU"/>
+                            <constraint firstItem="RxC-TQ-Cor" firstAttribute="bottom" secondItem="zv1-q9-c0X" secondAttribute="top" id="bXH-xS-nmx"/>
+                            <constraint firstAttribute="trailing" secondItem="O2i-In-7vC" secondAttribute="trailing" id="jwO-26-q1W"/>
+                            <constraint firstItem="RxC-TQ-Cor" firstAttribute="leading" secondItem="zv1-q9-c0X" secondAttribute="leading" id="m4n-mm-dTn"/>
+                            <constraint firstItem="RxC-TQ-Cor" firstAttribute="trailing" secondItem="zv1-q9-c0X" secondAttribute="trailing" id="s8T-u4-r0Y"/>
                         </constraints>
                     </view>
                     <connections>
@@ -129,6 +161,7 @@
                         <outlet property="collectionViewFlowLayout" destination="Sqt-2J-xjy" id="zgG-TH-Xas"/>
                         <outlet property="deleteButton" destination="QUp-bf-nbC" id="Svm-Wj-Qiv"/>
                         <outlet property="mapView" destination="zv1-q9-c0X" id="hrJ-QX-lci"/>
+                        <outlet property="noPhotosView" destination="O2i-In-7vC" id="fKk-a0-AFc"/>
                         <outlet property="photoCollectionView" destination="Taa-M5-Vd8" id="feT-oa-X4a"/>
                     </connections>
                 </viewController>

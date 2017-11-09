@@ -61,7 +61,11 @@ class FlickrClient: NSObject {
                 }
                 let photos = parsedResults["photos"] as! [String: AnyObject]
                 let photoArray = photos["photo"] as! [[String: AnyObject]]
-                self.getCDPins()
+                if FlickrClient.Constants.FlickrUsables.currentPin == nil {
+                    self.getCDPins()
+                }else {
+                    self.currentPinID = FlickrClient.Constants.FlickrUsables.currentPin.objectID
+                }
                 
                 for photo in photoArray {
                     context.perform {
@@ -80,7 +84,7 @@ class FlickrClient: NSObject {
             }
         }
         task.resume()
-    
+        
         completionHandlerForGetImagesFromLocationSearch(true, results)
         
     }
@@ -110,7 +114,9 @@ class FlickrClient: NSObject {
         
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
-        let requestResults = try! context.fetch(request) as! [Pin]
+        //let compoundRequestPredicate = NSCompoundPredicate(format: "(%K = %@) AND (%K = %@)","lon", "\(FlickrClient.Constants.FlickrUsables.currentPin.longitude)", "lat", "\(FlickrClient.Constants.FlickrUsables.currentPin.latitude)")
+        //request.predicate = compoundRequestPredicate
+        var requestResults = try! context.fetch(request) as! [Pin]
         for result in requestResults {
             let lat = Float(result.latitude)
             let lon = Float(result.longitude)
@@ -118,6 +124,7 @@ class FlickrClient: NSObject {
             if lat == FlickrClient.Constants.FlickrUsables.currentPin.latitude && lon == FlickrClient.Constants.FlickrUsables.currentPin.longitude {
                 self.currentPinID = result.objectID
                 print(self.currentPinID)
+                requestResults = []
                 
             }
         }

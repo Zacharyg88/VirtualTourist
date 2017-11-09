@@ -12,44 +12,19 @@ import MapKit
 
 class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
     
-    @IBOutlet weak var mapView:MKMapView! // = MKMapView()
+    @IBOutlet weak var mapView:MKMapView!
     @IBOutlet weak var photoCollectionView:UICollectionView!
     @IBOutlet weak var collectionViewFlowLayout: UICollectionViewFlowLayout!
     @IBOutlet weak var backButton: UIBarButtonItem!
     @IBOutlet weak var deleteButton: UIBarButtonItem!
+    @IBOutlet weak var noPhotosView: UIView!
     
     var photosArray = [Photo]()
-    
-    @IBAction func dismissPhotoCollectionViewController(_ sender: Any) {
-        self.dismiss(animated: true) {
-            FlickrClient.Constants.FlickrUsables.currentPin = Pin()
-            FlickrClient.Constants.FlickrUsables.photosArray = []
-        }
-    }
-    
-    @IBAction func deletePhotos(_ sender: Any) {
-        var pinID = NSManagedObjectID()
-        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        let photoFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
-        let pinFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
-        let fetchedPhotos = try! context.fetch(photoFetchRequest) as! [Photo]
-        let fetchedPins = try! context.fetch(pinFetchRequest) as! [Pin]
-        for pin in fetchedPins {
-            if pin.latitude == Float(self.mapView.centerCoordinate.latitude) && pin.longitude == Float(self.mapView.centerCoordinate.longitude) {
-                pinID = pin.objectID
-            }
-        }
-        for photo in fetchedPhotos {
-            if photo.pin?.objectID == pinID {
-                context.delete(photo)
-            }
-        }
-        self.dismiss(animated: true, completion: nil)
-        
-    }
+    var pinID = NSManagedObjectID()
+    var noPhotosBool = Bool()
     
     override func viewDidLoad() {
-        
+        noPhotosView.isHidden = true
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         super.viewDidLoad()
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
@@ -67,7 +42,9 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
                 }
             }
         }
-        
+        if photosArray.count == 0 {
+            noPhotosView.isHidden = false
+        }
         photoCollectionView?.delegate = self
         photoCollectionView?.dataSource = self
         
@@ -78,7 +55,49 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
         currentPinAnnotation.coordinate.latitude = CLLocationDegrees(FlickrClient.Constants.FlickrUsables.currentPin.latitude)
         currentPinAnnotation.coordinate.longitude = CLLocationDegrees(FlickrClient.Constants.FlickrUsables.currentPin.longitude)
         self.mapView?.addAnnotation(currentPinAnnotation)
+        
     }
+    
+    
+    @IBAction func dismissPhotoCollectionViewController(_ sender: Any) {
+        self.dismiss(animated: true) {
+            FlickrClient.Constants.FlickrUsables.currentPin = Pin()
+            FlickrClient.Constants.FlickrUsables.photosArray = []
+        }
+    }
+    
+    @IBAction func deletePhotos(_ sender: Any) {
+        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        for photo in photosArray {
+            context.delete(photo)
+            //photosArray = []
+            photoCollectionView.reloadData()
+            DispatchQueue.main.async {
+                FlickrClient.sharedInstance().getPhotosFromFlickr(lat: Float(self.mapView.centerCoordinate.latitude), lon: Float(self.mapView.centerCoordinate.longitude)) { (success, errorString) in
+                    if success != true {
+                        print(errorString)
+                    }else {
+                        print(FlickrClient.Constants.FlickrUsables.photosArray.count)
+                        self.photosArray = FlickrClient.Constants.FlickrUsables.photosArray
+                        //self.photoCollectionView.reloadData()
+                    }
+                }
+            }
+        }
+    }
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        let selectedIndex = Int(indexPath.item)
+        let selectedPhoto = photosArray[selectedIndex]
+        print(selectedPhoto)
+        selectedPhoto.pin = nil
+        context.delete(selectedPhoto)
+        photosArray.remove(at: selectedIndex)
+        photoCollectionView.reloadData()
+    }
+    
+    
+    
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         let reuseId = "pin"
         var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
@@ -100,6 +119,8 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
         let cell = photoCollectionView?.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! photoCollectionViewCell
         cell.photoActivityIndicator.isHidden = false
         cell.photoActivityIndicator.startAnimating()
+        print(photosArray.count)
+        
         let photo = self.photosArray[(indexPath as IndexPath).row]
         let photoURL = photo.imageURL
         let session = URLSession.shared
@@ -121,6 +142,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return (FlickrClient.Constants.FlickrUsables.currentPin.photo?.allObjects.count)!
     }
+    
 }
 
 
