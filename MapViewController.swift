@@ -15,6 +15,7 @@ class mapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
     @IBOutlet weak var  mapView = MKMapView()
     var currentPin = MKPointAnnotation()
     let aP = AppDelegate.self
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,8 +52,21 @@ class mapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         }
     }
     
+    func getCurrentPin(lat: Float, lon: Float) -> Any {
+        
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
+        let latPredicate = NSPredicate(format: "latitude = %@", [lat])
+        let lonPredicate = NSPredicate(format: "longitude = %@", [lon])
+        let latLonPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [latPredicate,lonPredicate])
+        fetchRequest.predicate = latLonPredicate
+        
+        let currentPin = try! context.fetch(fetchRequest)
+        print("The Current Pin is \(currentPin)")
+        
+        return currentPin
+    }
+    
     func addPinsFromConstants() {
-        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
         do {
             let cdPins = try context.fetch(fetchRequest)
@@ -75,46 +89,29 @@ class mapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
     }
     
     func addMapPins(gestureRecognizer: UILongPressGestureRecognizer) {
-        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         let annotation = MKPointAnnotation()
         let coordinate = gestureRecognizer.location(in: self.mapView)
         let newCoordinate = self.mapView?.convert(coordinate, toCoordinateFrom: self.mapView)
         annotation.coordinate = newCoordinate!
         self.mapView?.addAnnotation(annotation)
-        
+        currentPin = annotation
         if gestureRecognizer.state == UIGestureRecognizerState.ended {
             let newPin = Pin(latitude: Float(annotation.coordinate.latitude), longitude: Float(annotation.coordinate.longitude), context: context)
-            var currentPin:Pin?
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
-            do {
-                let fetchedPin = try! context.fetch(fetchRequest)
-                for pin in fetchedPin {
-                    if (pin as! Pin).latitude == Float(newPin.latitude) && (pin as! Pin).longitude == Float(newPin.longitude) {
-                        currentPin = pin as? Pin
-                    }
-                }
-            }
-            if currentPin != nil {
-                if (currentPin!.photo?.count)! > 0 {
-                    FlickrClient.Constants.FlickrUsables.currentPin = currentPin!
-                } else {
-                    FlickrClient.sharedInstance().getPhotosFromFlickr(lat: Float(newPin.latitude), lon: Float(newPin.longitude)) { (success, errorString) in
-                        
-                        if success != true {
-                            print(errorString)
-                        }else {
-                            
-                            print("success!")
-                            print(FlickrClient.Constants.FlickrUsables.photosArray.count)
-                            FlickrClient.Constants.FlickrUsables.currentPin = currentPin!
-                        }
+            if (newPin.photo?.count)! > 0 {
+                FlickrClient.Constants.FlickrUsables.currentPin = newPin
+            } else {
+                FlickrClient.sharedInstance().getPhotosFromFlickr(lat: Float(newPin.latitude), lon: Float(newPin.longitude)) { (success, errorString) in
+                    if success != true {
+                        print(errorString)
+                    }else {
+                        print("success!")
+                        print(FlickrClient.Constants.FlickrUsables.photosArray.count)
+                        FlickrClient.Constants.FlickrUsables.currentPin = newPin
                     }
                 }
             }
         }
     }
-    
-    
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         print(locations)
     }
@@ -123,35 +120,24 @@ class mapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
     }
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-        var currentPin:Pin?
-        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
-        do {
-            let fetchedPin = try! context.fetch(fetchRequest)
-            for pin in fetchedPin {
-                if (pin as! Pin).latitude == Float((view.annotation?.coordinate.latitude)!) && (pin as! Pin).longitude == Float((view.annotation?.coordinate.longitude)!) {
-                    currentPin = pin as! Pin
-                }
-            }
-        }
-        
-        if currentPin != nil {
-            if (currentPin!.photo?.count)! > 0 {
-                FlickrClient.Constants.FlickrUsables.currentPin = currentPin!
-                performSegue(withIdentifier: "showCollectionViewController", sender: nil)
-            } else {
-                FlickrClient.sharedInstance().getPhotosFromFlickr(lat: Float((view.annotation?.coordinate.latitude)!), lon: Float((view.annotation?.coordinate.longitude)!)) { (success, errorString) in
-                    
-                    if success != true {
-                        print(errorString)
-                    }else {
-                        
-                        print("success!")
-                        print(FlickrClient.Constants.FlickrUsables.photosArray.count)
-                        
-                        FlickrClient.Constants.FlickrUsables.currentPin = currentPin!
-                        self.performSegue(withIdentifier: "showCollectionViewController", sender: nil)
-                    }
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
+        let pin = getCurrentPin(lat: Float(self.currentPin.coordinate.latitude), lon: Float(self.currentPin.coordinate.longitude)) as! Pin
+        let pinPredicate = NSPredicate(format: "pin = %@", [pin])
+        fetchRequest.predicate = pinPredicate
+        let fetchedPins = try! context.fetch(fetchRequest) as! [Pin]
+        let fetchedPin = fetchedPins[0]
+        if (fetchedPin.photo?.count)! > 0 {
+            FlickrClient.Constants.FlickrUsables.currentPin = fetchedPin
+            performSegue(withIdentifier: "showCollectionViewController", sender: nil)
+        } else {
+            FlickrClient.sharedInstance().getPhotosFromFlickr(lat: fetchedPin.latitude, lon: fetchedPin.longitude) { (success, errorString) in
+                if success != true {
+                    print("The Error String  is: \(errorString)")
+                }else {
+                    print("success!")
+                    print(FlickrClient.Constants.FlickrUsables.photosArray.count)
+                    FlickrClient.Constants.FlickrUsables.currentPin = fetchedPin
+                    self.performSegue(withIdentifier: "showCollectionViewController", sender: nil)
                 }
             }
         }

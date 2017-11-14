@@ -10,7 +10,7 @@ import UIKit
 import CoreData
 import MapKit
 
-class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
+class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, NSFetchedResultsControllerDelegate {
     
     @IBOutlet weak var mapView:MKMapView!
     @IBOutlet weak var photoCollectionView:UICollectionView!
@@ -19,34 +19,33 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     @IBOutlet weak var deleteButton: UIBarButtonItem!
     @IBOutlet weak var noPhotosView: UIView!
     
-    var photosArray = [Photo]()
+    //var photosArray = [Photo]()
     var pinID = NSManagedObjectID()
     var noPhotosBool = Bool()
+    var fetchedResults = [Photo]()
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
+    
+    var fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult>? {
+        didSet{
+            fetchedResultsController?.delegate = self
+            fetchResults()
+            self.photoCollectionView.reloadData()
+            
+        }
+    }
     
     override func viewDidLoad() {
         noPhotosView.isHidden = true
-        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         super.viewDidLoad()
-        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
-        var currentPin: Pin
-        let fetchedPins = try! context.fetch(request) as! [Pin]
-        for pin in fetchedPins {
-            if pin.longitude == (FlickrClient.Constants.FlickrUsables.currentPin.longitude) && pin.latitude == (FlickrClient.Constants.FlickrUsables.currentPin.latitude) {
-                currentPin = pin
-                let photoRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
-                let fetchedPhotos = try! context.fetch(photoRequest) as! [Photo]
-                for photo in fetchedPhotos {
-                    if photo.pin == currentPin {
-                        photosArray.append(photo)
-                    }
-                }
-            }
-        }
-        if photosArray.count == 0 {
-            noPhotosView.isHidden = false
-        }
+        let photoRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
+        let photoPredicate = NSPredicate(format: "pin = %@", [FlickrClient.Constants.FlickrUsables.currentPin!])
+        photoRequest.predicate = photoPredicate
+        fetchedResults = try! context.fetch(photoRequest) as! [Photo]
         photoCollectionView?.delegate = self
         photoCollectionView?.dataSource = self
+         let frc = NSFetchedResultsController(fetchRequest: photoRequest, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
+        fetchedResultsController = frc
         
         // Map Setup
         self.mapView?.camera.altitude = CLLocationDistance(12000)
@@ -57,8 +56,18 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
         self.mapView?.addAnnotation(currentPinAnnotation)
         
     }
-    
-    
+    func fetchResults() {
+        if let fc = fetchedResultsController {
+            do {
+                try fc.performFetch()
+            }catch {
+                print(error)
+            }
+        }
+    }
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
     @IBAction func dismissPhotoCollectionViewController(_ sender: Any) {
         self.dismiss(animated: true) {
             FlickrClient.Constants.FlickrUsables.currentPin = Pin()
@@ -67,33 +76,25 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     }
     
     @IBAction func deletePhotos(_ sender: Any) {
-        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        for photo in photosArray {
+        
+        for photo in fetchedResults {
             context.delete(photo)
-            //photosArray = []
-            photoCollectionView.reloadData()
-            DispatchQueue.main.async {
-                FlickrClient.sharedInstance().getPhotosFromFlickr(lat: Float(self.mapView.centerCoordinate.latitude), lon: Float(self.mapView.centerCoordinate.longitude)) { (success, errorString) in
-                    if success != true {
-                        print(errorString)
-                    }else {
-                        print(FlickrClient.Constants.FlickrUsables.photosArray.count)
-                        self.photosArray = FlickrClient.Constants.FlickrUsables.photosArray
-                        //self.photoCollectionView.reloadData()
-                    }
-                }
-            }
+        }
+        DispatchQueue.main.async {
+            let photoRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
+            let photoPredicate = NSPredicate(format: "pin = %@", [FlickrClient.Constants.FlickrUsables.currentPin!])
+            photoRequest.predicate = photoPredicate
+            self.fetchedResults = try! self.context.fetch(photoRequest) as! [Photo]
         }
     }
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         let selectedIndex = Int(indexPath.item)
-        let selectedPhoto = photosArray[selectedIndex]
+        let selectedPhoto = self.fetchedResultsController?.object(at: indexPath) as! Photo
         print(selectedPhoto)
         selectedPhoto.pin = nil
         context.delete(selectedPhoto)
-        photosArray.remove(at: selectedIndex)
-        photoCollectionView.reloadData()
     }
     
     
@@ -119,9 +120,8 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
         let cell = photoCollectionView?.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! photoCollectionViewCell
         cell.photoActivityIndicator.isHidden = false
         cell.photoActivityIndicator.startAnimating()
-        print(photosArray.count)
         
-        let photo = self.photosArray[(indexPath as IndexPath).row]
+        let photo = fetchedResultsController?.object(at: indexPath) as! Photo
         let photoURL = photo.imageURL
         let session = URLSession.shared
         let request = URLRequest(url: URL(string: photoURL!)!)

@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="15G1510" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13527"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -54,6 +54,26 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="O2i-In-7vC">
+                                <rect key="frame" x="0.0" y="233" width="375" height="434"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No Photos Found" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Dc5-D8-l2B">
+                                        <rect key="frame" x="105" y="159" width="166" height="117"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="117" id="d0O-RG-Quf"/>
+                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="166" id="ygh-7t-7MC"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstItem="Dc5-D8-l2B" firstAttribute="top" secondItem="O2i-In-7vC" secondAttribute="top" constant="159" id="H32-or-tjS"/>
+                                    <constraint firstItem="Dc5-D8-l2B" firstAttribute="centerX" secondItem="O2i-In-7vC" secondAttribute="centerX" id="wR6-4e-heU"/>
+                                </constraints>
+                            </view>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="zv1-q9-c0X">
                                 <rect key="frame" x="0.0" y="44" width="375" height="191"/>
                                 <constraints>
@@ -81,29 +101,29 @@
                                 <rect key="frame" x="0.0" y="233" width="375" height="434"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="5" minimumInteritemSpacing="5" id="Sqt-2J-xjy">
-                                    <size key="itemSize" width="126" height="107"/>
+                                    <size key="itemSize" width="182" height="153"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="cell" id="R4a-B2-4Pa" customClass="photoCollectionViewCell" customModule="VirtualTourist_CoreData_" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="126" height="107"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="182" height="153"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="0.0" y="0.0" width="126" height="107"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="182" height="153"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="7qf-yh-HUO">
-                                                    <rect key="frame" x="0.0" y="0.0" width="126" height="116"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="182" height="153"/>
                                                 </imageView>
                                                 <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="zHY-yT-cdP">
-                                                    <rect key="frame" x="53" y="43" width="20" height="20"/>
+                                                    <rect key="frame" x="81" y="66.5" width="20" height="20"/>
                                                 </activityIndicatorView>
                                             </subviews>
                                         </view>
                                         <constraints>
-                                            <constraint firstAttribute="bottomMargin" secondItem="7qf-yh-HUO" secondAttribute="bottom" constant="-17" id="3dN-NL-kXe"/>
+                                            <constraint firstAttribute="bottomMargin" secondItem="7qf-yh-HUO" secondAttribute="bottom" constant="-8" id="3dN-NL-kXe"/>
                                             <constraint firstItem="7qf-yh-HUO" firstAttribute="centerX" secondItem="zHY-yT-cdP" secondAttribute="centerX" id="aOG-QD-oWk"/>
                                             <constraint firstItem="zHY-yT-cdP" firstAttribute="centerY" secondItem="R4a-B2-4Pa" secondAttribute="centerY" id="bKx-EE-BJe"/>
                                             <constraint firstAttribute="trailing" secondItem="7qf-yh-HUO" secondAttribute="trailing" id="bN1-Ir-Ctc"/>
@@ -111,32 +131,12 @@
                                             <constraint firstItem="7qf-yh-HUO" firstAttribute="top" secondItem="R4a-B2-4Pa" secondAttribute="top" id="yXy-Ee-McF"/>
                                         </constraints>
                                         <connections>
-                                            <outlet property="photoActivityIndicator" destination="zHY-yT-cdP" id="mRm-Jo-wg2"/>
-                                            <outlet property="photoImageView" destination="7qf-yh-HUO" id="VFu-Bn-8Xt"/>
+                                            <outlet property="photoActivityIndicator" destination="zHY-yT-cdP" id="rQi-3i-YeD"/>
+                                            <outlet property="photoImageView" destination="7qf-yh-HUO" id="Rzy-Vo-gYV"/>
                                         </connections>
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="O2i-In-7vC">
-                                <rect key="frame" x="0.0" y="233" width="375" height="434"/>
-                                <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No Photos Found" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Dc5-D8-l2B">
-                                        <rect key="frame" x="105" y="159" width="166" height="117"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="117" id="d0O-RG-Quf"/>
-                                            <constraint firstAttribute="width" constant="166" id="ygh-7t-7MC"/>
-                                        </constraints>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                </subviews>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <constraints>
-                                    <constraint firstItem="Dc5-D8-l2B" firstAttribute="top" secondItem="O2i-In-7vC" secondAttribute="top" constant="159" id="H32-or-tjS"/>
-                                    <constraint firstItem="Dc5-D8-l2B" firstAttribute="centerX" secondItem="O2i-In-7vC" secondAttribute="centerX" id="wR6-4e-heU"/>
-                                </constraints>
-                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>

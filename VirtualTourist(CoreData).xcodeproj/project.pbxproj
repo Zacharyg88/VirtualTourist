@@ -258,6 +258,7 @@
 				TargetAttributes = {
 					92D959CD1F91415400E4B623 = {
 						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = AC45FSW6UK;
 						ProvisioningStyle = Automatic;
 					};
 					92D959E41F91415500E4B623 = {
@@ -490,6 +491,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = AC45FSW6UK;
 				INFOPLIST_FILE = "VirtualTourist(CoreData)/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "Eidenberger.VirtualTourist-CoreData-";
@@ -502,6 +504,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = AC45FSW6UK;
 				INFOPLIST_FILE = "VirtualTourist(CoreData)/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "Eidenberger.VirtualTourist-CoreData-";
