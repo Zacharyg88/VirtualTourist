@@ -24,6 +24,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     var noPhotosBool = Bool()
     var fetchedResults = [Photo]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    var deletedPhoto: Photo!
     
     
     var fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult>? {
@@ -38,8 +39,13 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     override func viewDidLoad() {
         noPhotosView.isHidden = true
         super.viewDidLoad()
+        let currentPin = FlickrClient.Constants.FlickrUsables.currentPin
+        print(currentPin)
+        
         let photoRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
-        let photoPredicate = NSPredicate(format: "pin = %@", [FlickrClient.Constants.FlickrUsables.currentPin!])
+        let photoPredicate = NSPredicate(format: "pin = %@", currentPin!)
+        let sort = NSSortDescriptor(key: "id", ascending: false)
+        photoRequest.sortDescriptors = [sort]
         photoRequest.predicate = photoPredicate
         fetchedResults = try! context.fetch(photoRequest) as! [Photo]
         photoCollectionView?.delegate = self
@@ -76,28 +82,20 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     }
     
     @IBAction func deletePhotos(_ sender: Any) {
-        
-        for photo in fetchedResults {
-            context.delete(photo)
+        for photo in (fetchedResultsController?.fetchedObjects)! {
+            fetchedResultsController?.managedObjectContext.delete(photo as! NSManagedObject)
         }
-        DispatchQueue.main.async {
-            let photoRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
-            let photoPredicate = NSPredicate(format: "pin = %@", [FlickrClient.Constants.FlickrUsables.currentPin!])
-            photoRequest.predicate = photoPredicate
-            self.fetchedResults = try! self.context.fetch(photoRequest) as! [Photo]
-        }
+        try! fetchedResultsController?.performFetch()
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        let selectedIndex = Int(indexPath.item)
-        let selectedPhoto = self.fetchedResultsController?.object(at: indexPath) as! Photo
-        print(selectedPhoto)
-        selectedPhoto.pin = nil
-        context.delete(selectedPhoto)
+        
+        fetchedResultsController?.managedObjectContext.delete(fetchedResultsController?.object(at: indexPath) as! NSManagedObject)
     }
     
-    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        fetchedResultsController?.managedObjectContext.
+    }
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         let reuseId = "pin"
@@ -136,14 +134,9 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
             }
         }
         task.resume()
-        
         return cell
     }
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return (FlickrClient.Constants.FlickrUsables.currentPin.photo?.allObjects.count)!
     }
-    
 }
-
-
-

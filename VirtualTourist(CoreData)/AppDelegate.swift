@@ -92,7 +92,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
     }
-    
     func startAutoSave(delay: Int) {
         if delay > 0 {
             do {
@@ -109,6 +108,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
     }
-
 }
-

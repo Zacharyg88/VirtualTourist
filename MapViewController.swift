@@ -52,15 +52,16 @@ class mapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         }
     }
     
-    func getCurrentPin(lat: Float, lon: Float) -> Any {
+    func getCurrentPin(lat: Float, lon: Float) -> [Pin] {
+        print(lat,lon)
         
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
-        let latPredicate = NSPredicate(format: "latitude = %@", [lat])
-        let lonPredicate = NSPredicate(format: "longitude = %@", [lon])
+        let latPredicate = NSPredicate(format: "latitude = %f", lat)
+        let lonPredicate = NSPredicate(format: "longitude = %f", lon)
         let latLonPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [latPredicate,lonPredicate])
         fetchRequest.predicate = latLonPredicate
         
-        let currentPin = try! context.fetch(fetchRequest)
+        let currentPin = try! context.fetch(fetchRequest) as! [Pin]
         print("The Current Pin is \(currentPin)")
         
         return currentPin
@@ -120,23 +121,21 @@ class mapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
     }
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
-        let pin = getCurrentPin(lat: Float(self.currentPin.coordinate.latitude), lon: Float(self.currentPin.coordinate.longitude)) as! Pin
-        let pinPredicate = NSPredicate(format: "pin = %@", [pin])
-        fetchRequest.predicate = pinPredicate
-        let fetchedPins = try! context.fetch(fetchRequest) as! [Pin]
-        let fetchedPin = fetchedPins[0]
-        if (fetchedPin.photo?.count)! > 0 {
-            FlickrClient.Constants.FlickrUsables.currentPin = fetchedPin
+        let pin = getCurrentPin(lat: Float((view.annotation?.coordinate.latitude)!), lon: Float((view.annotation?.coordinate.longitude)!))
+        let currentPin = pin[0]
+        print(currentPin)
+       
+        if (currentPin.photo?.count)! > 0 {
+            FlickrClient.Constants.FlickrUsables.currentPin = currentPin
             performSegue(withIdentifier: "showCollectionViewController", sender: nil)
         } else {
-            FlickrClient.sharedInstance().getPhotosFromFlickr(lat: fetchedPin.latitude, lon: fetchedPin.longitude) { (success, errorString) in
+            FlickrClient.sharedInstance().getPhotosFromFlickr(lat: currentPin.latitude, lon: currentPin.longitude) { (success, errorString) in
                 if success != true {
                     print("The Error String  is: \(errorString)")
                 }else {
                     print("success!")
                     print(FlickrClient.Constants.FlickrUsables.photosArray.count)
-                    FlickrClient.Constants.FlickrUsables.currentPin = fetchedPin
+                    FlickrClient.Constants.FlickrUsables.currentPin = currentPin
                     self.performSegue(withIdentifier: "showCollectionViewController", sender: nil)
                 }
             }
