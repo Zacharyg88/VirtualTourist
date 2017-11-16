@@ -17,8 +17,8 @@ extension FlickrClient {
             static let APIPath = "/services/rest"
             static let SearchLatRange = (-90.0, 90.0)
             static let SearchLonRange = (-180.0, 180.0)
-            static let bboxHalfWidth = Float(1.0)
-            static let bboxHalfHeight = Float(1.0)
+            static let bboxHalfWidth = Float(0.5)
+            static let bboxHalfHeight = Float(0.5)
             static var  photosDictionary = [String: AnyObject]()
             
             
