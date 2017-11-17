@@ -18,10 +18,10 @@ import UIKit
 import CoreData
 
 class FlickrClient: NSObject {
-    var currentPinID = NSManagedObjectID()
-    var currentPinLat = Float()
-    var currentPinLon = Float()
-    
+    var currentPin = [Pin]()
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+
+
     
     func searchFlickrByLocation(lat: Float, lon: Float, completionHandlerForSearchFlickerByLocation: @escaping (_ success: Bool,_ results: [Photo], _ errorString: String) -> Void) {
         let methodParameters = [
@@ -32,6 +32,11 @@ class FlickrClient: NSObject {
             Constants.FlickrKeys.method: Constants.FlickerValues.searchMethod,
             Constants.FlickrKeys.noJSONCallback: Constants.FlickerValues.disableJSONCallback
         ]
+        let fetchPin = NSFetchRequest<Pin>(entityName: "Pin")
+        let latPredicate = NSPredicate(format: "latitude = %f", lat)
+        let lonPredicate = NSPredicate(format: "longitude = %f", lon)
+        fetchPin.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [latPredicate, lonPredicate])
+        currentPin = try! context.fetch(fetchPin)
         getImagesFromLocationSearch(methodParameters as [String : AnyObject]) { (success, results) in
             if success == true {
                 completionHandlerForSearchFlickerByLocation(true, results, "")
@@ -50,7 +55,6 @@ class FlickrClient: NSObject {
         let session = URLSession.shared
         var results = [Photo]()
         let request = URLRequest(url: flickrURLFromParameters(methodParameters))
-        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         let task = session.dataTask(with: request) { (data, response, error) in
             if error != nil {
                 print("There was an error! \(error)")
@@ -61,24 +65,15 @@ class FlickrClient: NSObject {
                 }
                 let photos = parsedResults["photos"] as! [String: AnyObject]
                 let photoArray = photos["photo"] as! [[String: AnyObject]]
-                if FlickrClient.Constants.FlickrUsables.currentPin == nil {
-                    self.getCDPins()
-                }else {
-                    self.currentPinID = FlickrClient.Constants.FlickrUsables.currentPin.objectID
-                }
-                
                 for photo in photoArray {
-                    context.perform {
-                        let currentPinID = context.object(with: self.currentPinID)
-                        
+                    self.context.perform {
                         let farm = String(describing: photo["farm"]!)
                         let id = photo["id"] as! String
                         let server = photo["server"] as! String
                         let secret = photo["secret"] as! String
                         let photoURL = "https://farm\(farm).staticflickr.com/\(server)/\(id)_\(secret).jpg"
-                        let newPhoto = Photo.init(id: (Double(id))!, imageURL: photoURL, title: photo["title"] as! String, pin: currentPinID as! Pin, context: context)
+                        let newPhoto = Photo.init(id: (Double(id))!, imageURL: photoURL, title: photo["title"] as! String, pin: self.currentPin[0] , context: self.context)
                         results.append(newPhoto)
-                        FlickrClient.Constants.FlickrUsables.photosArray.append(newPhoto)
                     }
                 }
             }
@@ -109,26 +104,5 @@ class FlickrClient: NSObject {
         }
         return Singleton.sharedInstance
     }
-    
-    func getCDPins() {
-        
-        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
-        //let compoundRequestPredicate = NSCompoundPredicate(format: "(%K = %@) AND (%K = %@)","lon", "\(FlickrClient.Constants.FlickrUsables.currentPin.longitude)", "lat", "\(FlickrClient.Constants.FlickrUsables.currentPin.latitude)")
-        //request.predicate = compoundRequestPredicate
-        var requestResults = try! context.fetch(request) as! [Pin]
-        for result in requestResults {
-            let lat = Float(result.latitude)
-            let lon = Float(result.longitude)
-            
-            if lat == FlickrClient.Constants.FlickrUsables.currentPin.latitude && lon == FlickrClient.Constants.FlickrUsables.currentPin.longitude {
-                self.currentPinID = result.objectID
-                print(self.currentPinID)
-                requestResults = []
-                
-            }
-        }
-    }
-    
 }
 

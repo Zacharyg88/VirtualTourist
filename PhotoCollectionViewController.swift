@@ -38,8 +38,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     override func viewDidLoad() {
         noPhotosView.isHidden = true
         super.viewDidLoad()
-        let currentPin = FlickrClient.Constants.FlickrUsables.currentPin
-        print(currentPin)
+        let currentPin = fetchedResultsController?.managedObjectContext.object(with: FlickrClient.Constants.Flickr.currentPinObjectID)
         
         let photoRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
         let photoPredicate = NSPredicate(format: "pin = %@", currentPin!)
@@ -54,10 +53,10 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
         
         // Map Setup
         self.mapView?.camera.altitude = CLLocationDistance(12000)
-        self.mapView?.centerCoordinate = CLLocationCoordinate2D(latitude: CLLocationDegrees(FlickrClient.Constants.FlickrUsables.currentPin.latitude), longitude: CLLocationDegrees(FlickrClient.Constants.FlickrUsables.currentPin.longitude))
+        self.mapView?.centerCoordinate = CLLocationCoordinate2D(latitude: CLLocationDegrees(currentPin.latitude), longitude: CLLocationDegrees(currentPin.longitude))
         let currentPinAnnotation = MKPointAnnotation()
-        currentPinAnnotation.coordinate.latitude = CLLocationDegrees(FlickrClient.Constants.FlickrUsables.currentPin.latitude)
-        currentPinAnnotation.coordinate.longitude = CLLocationDegrees(FlickrClient.Constants.FlickrUsables.currentPin.longitude)
+        currentPinAnnotation.coordinate.latitude = CLLocationDegrees(currentPin.latitude)
+        currentPinAnnotation.coordinate.longitude = CLLocationDegrees(currentPin.longitude)
         self.mapView?.addAnnotation(currentPinAnnotation)
     }
     
@@ -76,8 +75,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     
     @IBAction func dismissPhotoCollectionViewController(_ sender: Any) {
         self.dismiss(animated: true) {
-            FlickrClient.Constants.FlickrUsables.currentPin = Pin()
-            FlickrClient.Constants.FlickrUsables.photosArray = []
+            FlickrClient.Constants.Flickr.currentPinObjectID = nil
         }
     }
     

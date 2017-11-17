@@ -13,8 +13,6 @@ import MapKit
 class mapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDelegate {
     
     @IBOutlet weak var  mapView = MKMapView()
-    var currentPin = MKPointAnnotation()
-    let aP = AppDelegate.self
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     override func viewDidLoad() {
@@ -27,8 +25,6 @@ class mapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         locationManger.delegate = self
         self.mapView?.delegate = self
         locationManger.requestLocation()
-        
-        
         let longTapGesture = UILongPressGestureRecognizer(target: self, action: #selector(addMapPins(gestureRecognizer:)))
         longTapGesture.minimumPressDuration = 2.0
         self.mapView?.addGestureRecognizer(longTapGesture)
@@ -95,19 +91,19 @@ class mapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         let newCoordinate = self.mapView?.convert(coordinate, toCoordinateFrom: self.mapView)
         annotation.coordinate = newCoordinate!
         self.mapView?.addAnnotation(annotation)
-        currentPin = annotation
+        //currentPin = annotation
         if gestureRecognizer.state == UIGestureRecognizerState.ended {
             let newPin = Pin(latitude: Float(annotation.coordinate.latitude), longitude: Float(annotation.coordinate.longitude), context: context)
             if (newPin.photo?.count)! > 0 {
-                FlickrClient.Constants.FlickrUsables.currentPin = newPin
+//                FlickrClient.Constants.FlickrUsables.currentPin = newPin
             } else {
                 FlickrClient.sharedInstance().getPhotosFromFlickr(lat: Float(newPin.latitude), lon: Float(newPin.longitude)) { (success, errorString) in
                     if success != true {
                         print(errorString)
                     }else {
                         print("success!")
-                        print(FlickrClient.Constants.FlickrUsables.photosArray.count)
-                        FlickrClient.Constants.FlickrUsables.currentPin = newPin
+//                        print(FlickrClient.Constants.FlickrUsables.photosArray.count)
+//                        FlickrClient.Constants.FlickrUsables.currentPin = newPin
                     }
                 }
             }
@@ -123,22 +119,24 @@ class mapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         let pin = getCurrentPin(lat: Float((view.annotation?.coordinate.latitude)!), lon: Float((view.annotation?.coordinate.longitude)!))
         let currentPin = pin[0]
-        print(currentPin)
-       
+        FlickrClient.Constants.Flickr.currentPinObjectID = currentPin.objectID
         if (currentPin.photo?.count)! > 0 {
-            FlickrClient.Constants.FlickrUsables.currentPin = currentPin
-            performSegue(withIdentifier: "showCollectionViewController", sender: nil)
+            performSegue(withIdentifier: "showCollectionViewController", sender: self)
         } else {
             FlickrClient.sharedInstance().getPhotosFromFlickr(lat: currentPin.latitude, lon: currentPin.longitude) { (success, errorString) in
                 if success != true {
                     print("The Error String  is: \(errorString)")
                 }else {
                     print("success!")
-                    print(FlickrClient.Constants.FlickrUsables.photosArray.count)
-                    FlickrClient.Constants.FlickrUsables.currentPin = currentPin
                     self.performSegue(withIdentifier: "showCollectionViewController", sender: nil)
                 }
             }
         }
+    }
+    class func sharedInstance() -> mapViewController {
+        struct Singleton {
+            static var sharedInstance = mapViewController()
+        }
+        return Singleton.sharedInstance
     }
 }

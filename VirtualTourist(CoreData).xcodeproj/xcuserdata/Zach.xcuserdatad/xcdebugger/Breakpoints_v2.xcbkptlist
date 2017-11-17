@@ -29,7 +29,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "VirtualTourist(CoreData)/FlickrConvenience.swift"
-            timestampString = "531788598.333796"
+            timestampString = "532640325.852037"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "20"
@@ -41,15 +41,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "PhotoCollectionViewController.swift"
-            timestampString = "532555572.124663"
+            timestampString = "532640325.971691"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "140"
-            endingLineNumber = "140"
+            startingLineNumber = "138"
+            endingLineNumber = "138"
             landmarkName = "mapView(_:viewFor:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -61,11 +61,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "MapViewController.swift"
-            timestampString = "532555572.125633"
+            timestampString = "532640325.972889"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "123"
-            endingLineNumber = "123"
+            startingLineNumber = "119"
+            endingLineNumber = "119"
             landmarkName = "mapView(_:didSelect:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -73,46 +73,46 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "VirtualTourist(CoreData)/FlickrClient.swift"
-            timestampString = "532554879.644797"
+            timestampString = "532640325.973256"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "35"
-            endingLineNumber = "35"
+            startingLineNumber = "40"
+            endingLineNumber = "40"
             landmarkName = "searchFlickrByLocation(lat:lon:completionHandlerForSearchFlickerByLocation:)"
             landmarkType = "7">
             <Locations>
                <Location
-                  shouldBeEnabled = "Yes"
+                  shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
                   symbolName = "VirtualTourist_CoreData_.FlickrClient.searchFlickrByLocation(lat: Swift.Float, lon: Swift.Float, completionHandlerForSearchFlickerByLocation: (Swift.Bool, Swift.Array&lt;VirtualTourist_CoreData_.Photo&gt;, Swift.String) -&gt; ()) -&gt; ()"
                   moduleName = "VirtualTourist(CoreData)"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/Zach/Documents/Zach&apos;s%20Stuff/Coding%20Documents/Apps/VirtualTourist(CoreData)/VirtualTourist(CoreData)/FlickrClient.swift"
-                  timestampString = "532555572.791842"
+                  timestampString = "532635230.515673"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "35"
-                  endingLineNumber = "35"
-                  offsetFromSymbolStart = "904">
+                  startingLineNumber = "40"
+                  endingLineNumber = "40"
+                  offsetFromSymbolStart = "1656">
                </Location>
                <Location
-                  shouldBeEnabled = "Yes"
+                  shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
                   symbolName = "closure #1 (Swift.Bool, Swift.Array&lt;VirtualTourist_CoreData_.Photo&gt;) -&gt; () in VirtualTourist_CoreData_.FlickrClient.searchFlickrByLocation(lat: Swift.Float, lon: Swift.Float, completionHandlerForSearchFlickerByLocation: (Swift.Bool, Swift.Array&lt;VirtualTourist_CoreData_.Photo&gt;, Swift.String) -&gt; ()) -&gt; ()"
                   moduleName = "VirtualTourist(CoreData)"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/Zach/Documents/Zach&apos;s%20Stuff/Coding%20Documents/Apps/VirtualTourist(CoreData)/VirtualTourist(CoreData)/FlickrClient.swift"
-                  timestampString = "532555572.794118"
+                  timestampString = "532635230.517968"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "36"
-                  endingLineNumber = "36"
+                  startingLineNumber = "41"
+                  endingLineNumber = "41"
                   offsetFromSymbolStart = "36">
                </Location>
             </Locations>
@@ -121,15 +121,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "MapViewController.swift"
-            timestampString = "532555572.12591"
+            timestampString = "532640325.973608"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "92"
-            endingLineNumber = "92"
+            startingLineNumber = "88"
+            endingLineNumber = "88"
             landmarkName = "addMapPins(gestureRecognizer:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -141,11 +141,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "MapViewController.swift"
-            timestampString = "532555572.12598"
+            timestampString = "532640325.973737"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "101"
-            endingLineNumber = "101"
+            startingLineNumber = "97"
+            endingLineNumber = "97"
             landmarkName = "addMapPins(gestureRecognizer:)"
             landmarkType = "7">
             <Locations>
@@ -157,12 +157,12 @@
                   moduleName = "VirtualTourist(CoreData)"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/Zach/Documents/Zach&apos;s%20Stuff/Coding%20Documents/Apps/VirtualTourist(CoreData)/MapViewController.swift"
-                  timestampString = "532555572.806542"
+                  timestampString = "532640326.057644"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "101"
-                  endingLineNumber = "101"
-                  offsetFromSymbolStart = "1400">
+                  startingLineNumber = "97"
+                  endingLineNumber = "97"
+                  offsetFromSymbolStart = "1344">
                </Location>
                <Location
                   shouldBeEnabled = "Yes"
@@ -172,12 +172,12 @@
                   moduleName = "VirtualTourist(CoreData)"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/Zach/Documents/Zach&apos;s%20Stuff/Coding%20Documents/Apps/VirtualTourist(CoreData)/MapViewController.swift"
-                  timestampString = "532555572.809243"
+                  timestampString = "532640326.059975"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "101"
-                  endingLineNumber = "101"
-                  offsetFromSymbolStart = "2144">
+                  startingLineNumber = "97"
+                  endingLineNumber = "97"
+                  offsetFromSymbolStart = "1928">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -185,15 +185,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "PhotoCollectionViewController.swift"
-            timestampString = "532555572.12604"
+            timestampString = "532640325.973865"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "85"
-            endingLineNumber = "85"
+            startingLineNumber = "83"
+            endingLineNumber = "83"
             landmarkName = "deletePhotos(_:)"
             landmarkType = "7">
          </BreakpointContent>

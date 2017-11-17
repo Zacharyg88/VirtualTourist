@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 extension FlickrClient {
     
     struct Constants {
@@ -20,8 +21,7 @@ extension FlickrClient {
             static let bboxHalfWidth = Float(0.5)
             static let bboxHalfHeight = Float(0.5)
             static var  photosDictionary = [String: AnyObject]()
-            
-            
+            static var currentPinObjectID: NSManagedObjectID!
         }
         
         struct FlickrKeys {
@@ -59,13 +59,13 @@ extension FlickrClient {
             static let total = "total"
             
         }
-        struct FlickrUsables {
-            static var photosArray = [Photo]()
-            static var currentPinLat = Float()
-            static var currentPinLon = Float()
-            static var currentPin: Pin!
-            static var noPhotosBool = Bool()
-        }
+//        struct FlickrUsables {
+//            static var photosArray = [Photo]()
+//            static var currentPinLat = Float()
+//            static var currentPinLon = Float()
+//            static var currentPin: Pin!
+//            static var noPhotosBool = Bool()
+//        }
         
     }
 }
