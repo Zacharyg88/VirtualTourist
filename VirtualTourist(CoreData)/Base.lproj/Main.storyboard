@@ -107,14 +107,14 @@
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="cell" id="R4a-B2-4Pa" customClass="photoCollectionViewCell" customModule="VirtualTourist_CoreData_" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" contentMode="center" reuseIdentifier="cell" id="R4a-B2-4Pa" customClass="photoCollectionViewCell" customModule="VirtualTourist_CoreData_" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="182" height="153"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="182" height="153"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="7qf-yh-HUO">
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="7qf-yh-HUO">
                                                     <rect key="frame" x="0.0" y="0.0" width="182" height="153"/>
                                                 </imageView>
                                                 <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="zHY-yT-cdP">
@@ -122,6 +122,7 @@
                                                 </activityIndicatorView>
                                             </subviews>
                                         </view>
+                                        <rect key="contentStretch" x="0.0" y="0.0" width="0.0" height="0.0"/>
                                         <constraints>
                                             <constraint firstAttribute="bottomMargin" secondItem="7qf-yh-HUO" secondAttribute="bottom" constant="-8" id="3dN-NL-kXe"/>
                                             <constraint firstItem="7qf-yh-HUO" firstAttribute="centerX" secondItem="zHY-yT-cdP" secondAttribute="centerX" id="aOG-QD-oWk"/>
@@ -131,6 +132,7 @@
                                             <constraint firstItem="7qf-yh-HUO" firstAttribute="top" secondItem="R4a-B2-4Pa" secondAttribute="top" id="yXy-Ee-McF"/>
                                         </constraints>
                                         <connections>
+                                            <outlet property="collectionViewFlowLayout" destination="Sqt-2J-xjy" id="8rb-cU-J97"/>
                                             <outlet property="photoActivityIndicator" destination="zHY-yT-cdP" id="rQi-3i-YeD"/>
                                             <outlet property="photoImageView" destination="7qf-yh-HUO" id="Rzy-Vo-gYV"/>
                                         </connections>
@@ -158,16 +160,17 @@
                     </view>
                     <connections>
                         <outlet property="backButton" destination="pFc-Yl-Cmj" id="FfU-WQ-8JR"/>
-                        <outlet property="collectionViewFlowLayout" destination="Sqt-2J-xjy" id="zgG-TH-Xas"/>
+                        <outlet property="collectionViewFlowLayout" destination="Sqt-2J-xjy" id="OI3-3F-uGN"/>
                         <outlet property="deleteButton" destination="QUp-bf-nbC" id="Svm-Wj-Qiv"/>
                         <outlet property="mapView" destination="zv1-q9-c0X" id="hrJ-QX-lci"/>
                         <outlet property="noPhotosView" destination="O2i-In-7vC" id="fKk-a0-AFc"/>
                         <outlet property="photoCollectionView" destination="Taa-M5-Vd8" id="feT-oa-X4a"/>
+                        <outlet property="photoCollectionViewFlowLayout" destination="Sqt-2J-xjy" id="9hX-S7-otL"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Pnj-Zp-BWI" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1400.8" y="121.88905547226388"/>
+            <point key="canvasLocation" x="1498" y="33"/>
         </scene>
     </scenes>
 </document>

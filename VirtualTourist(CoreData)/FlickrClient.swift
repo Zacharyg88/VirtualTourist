@@ -30,8 +30,12 @@ class FlickrClient: NSObject {
             Constants.FlickrKeys.apiKey: Constants.FlickerValues.APIKey,
             Constants.FlickrKeys.format: Constants.FlickerValues.responseFormat,
             Constants.FlickrKeys.method: Constants.FlickerValues.searchMethod,
-            Constants.FlickrKeys.noJSONCallback: Constants.FlickerValues.disableJSONCallback
+            Constants.FlickrKeys.noJSONCallback: Constants.FlickerValues.disableJSONCallback,
+            Constants.FlickrKeys.perPage: Constants.FlickerValues.perPage,
+            Constants.FlickrKeys.page: getRandomPageNumber(number: 3)
         ]
+        
+        
         let fetchPin = NSFetchRequest<Pin>(entityName: "Pin")
         let latPredicate = NSPredicate(format: "latitude = %f", lat)
         let lonPredicate = NSPredicate(format: "longitude = %f", lon)
@@ -43,6 +47,13 @@ class FlickrClient: NSObject {
             }
         }
     }
+    
+    func getRandomPageNumber(number: Int) -> String {
+        let randomNumber = Int(arc4random_uniform(UInt32(number)))
+        let randomNumberString = String(randomNumber)
+        return randomNumberString
+    }
+    
     func bboxString(lat: Float, lon: Float) -> String {
         let minimumLon = max(lon - Constants.Flickr.bboxHalfWidth, Float(Constants.Flickr.SearchLonRange.0))
         let minimumLat = max(lat - Constants.Flickr.bboxHalfHeight, Float(Constants.Flickr.SearchLatRange.0))
@@ -73,6 +84,7 @@ class FlickrClient: NSObject {
                         let secret = photo["secret"] as! String
                         let photoURL = "https://farm\(farm).staticflickr.com/\(server)/\(id)_\(secret).jpg"
                         let newPhoto = Photo.init(id: (Double(id))!, imageURL: photoURL, title: photo["title"] as! String, pin: self.currentPin[0] , context: self.context)
+                        
                         results.append(newPhoto)
                     }
                 }

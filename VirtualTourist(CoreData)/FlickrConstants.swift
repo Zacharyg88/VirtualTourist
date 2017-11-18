@@ -34,6 +34,7 @@ extension FlickrClient {
             static let text = "text"
             static let page = "page"
             static let boundingBox = "bbox"
+            static let perPage = "per_page"
             
         }
         
@@ -46,6 +47,8 @@ extension FlickrClient {
             static let galleryID = "5704-72157622566655097"
             static let mediumURL = "url_m"
             static let useSafeSearch = "1"
+            static let perPage = "36"
+            static let page = ""
             
             
         }

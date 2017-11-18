@@ -86,24 +86,19 @@ class mapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
     }
     
     func addMapPins(gestureRecognizer: UILongPressGestureRecognizer) {
-        let annotation = MKPointAnnotation()
-        let coordinate = gestureRecognizer.location(in: self.mapView)
-        let newCoordinate = self.mapView?.convert(coordinate, toCoordinateFrom: self.mapView)
-        annotation.coordinate = newCoordinate!
-        self.mapView?.addAnnotation(annotation)
-        //currentPin = annotation
         if gestureRecognizer.state == UIGestureRecognizerState.ended {
+            let annotation = MKPointAnnotation()
+            let coordinate = gestureRecognizer.location(in: self.mapView)
+            let newCoordinate = self.mapView?.convert(coordinate, toCoordinateFrom: self.mapView)
+            annotation.coordinate = newCoordinate!
+            self.mapView?.addAnnotation(annotation)
             let newPin = Pin(latitude: Float(annotation.coordinate.latitude), longitude: Float(annotation.coordinate.longitude), context: context)
-            if (newPin.photo?.count)! > 0 {
-//                FlickrClient.Constants.FlickrUsables.currentPin = newPin
-            } else {
+            if (newPin.photo?.count)! == 0 {
                 FlickrClient.sharedInstance().getPhotosFromFlickr(lat: Float(newPin.latitude), lon: Float(newPin.longitude)) { (success, errorString) in
                     if success != true {
                         print(errorString)
                     }else {
                         print("success!")
-//                        print(FlickrClient.Constants.FlickrUsables.photosArray.count)
-//                        FlickrClient.Constants.FlickrUsables.currentPin = newPin
                     }
                 }
             }
