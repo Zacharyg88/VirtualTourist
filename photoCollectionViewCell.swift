@@ -15,6 +15,5 @@ class photoCollectionViewCell: UICollectionViewCell {
     override func prepareForReuse() {
         photoImageView.image = nil
         super.prepareForReuse()
-        
     }
 }

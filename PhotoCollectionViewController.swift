@@ -10,21 +10,21 @@ import UIKit
 import CoreData
 import MapKit
 
-class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, NSFetchedResultsControllerDelegate, UICollectionViewDelegateFlowLayout {
+class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, NSFetchedResultsControllerDelegate {
     
     @IBOutlet weak var mapView:MKMapView!
     @IBOutlet weak var photoCollectionView:UICollectionView!
     @IBOutlet weak var backButton: UIBarButtonItem!
     @IBOutlet weak var deleteButton: UIBarButtonItem!
     @IBOutlet weak var noPhotosView: UIView!
-    @IBOutlet weak var photoCollectionViewFlowLayout: UICollectionViewFlowLayout!
     
-    //var photosArray = [Photo]()
     var pinID = NSManagedObjectID()
     var noPhotosBool = Bool()
     var fetchedResults = [Photo]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     var shouldReloadCollectionView = Bool()
+    var deletedIndexes = [IndexPath]()
+    var deleteAllPhotosIndexPaths = [IndexPath]()
     var blockOperations = [BlockOperation]()
     
     
@@ -39,7 +39,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     override func viewDidLoad() {
         noPhotosView.isHidden = true
         super.viewDidLoad()
-        photoCollectionView.setCollectionViewLayout(photoCollectionViewFlowLayout, animated: true)
+        //photoCollectionView.setCollectionViewLayout(photoCollectionViewFlowLayout, animated: true)
         var currentPin: Pin!
         let fetchPin = NSFetchRequest<Pin>(entityName: "Pin")
         let fetchedPins = try! context.fetch(fetchPin)
@@ -58,13 +58,9 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
         fetchedResults = try! context.fetch(photoRequest) as! [Photo]
         photoCollectionView?.delegate = self
         photoCollectionView?.dataSource = self
-        
         let frc = NSFetchedResultsController(fetchRequest: photoRequest, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController = frc
-        let viewWidth = (self.view.frame.width)
-        photoCollectionViewFlowLayout.minimumInteritemSpacing = 16
-        photoCollectionViewFlowLayout.minimumLineSpacing = 16
-        photoCollectionViewFlowLayout.itemSize = CGSize(width: ((viewWidth/3)-8), height: ((viewWidth/3)-8))
+        
         
         // Map Setup
         self.mapView?.camera.altitude = CLLocationDistance(12000)
@@ -95,9 +91,12 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     }
     
     @IBAction func deletePhotos(_ sender: Any) {
-        for photo in (fetchedResultsController?.fetchedObjects)! {
-            fetchedResultsController?.managedObjectContext.delete(photo as! NSManagedObject)
-            
+        var deletePhotos = [Photo]()
+        for index in deleteAllPhotosIndexPaths {
+            deletePhotos.append(fetchedResultsController?.object(at: index) as! Photo)
+        }
+        for photo in deletePhotos {
+            fetchedResultsController?.managedObjectContext.delete(photo)
         }
         FlickrClient.sharedInstance().getPhotosFromFlickr(lat: Float(mapView.annotations[0].coordinate.latitude), lon: Float(mapView.annotations[0].coordinate.longitude)) { (success, error) in
             if success != true {
@@ -111,11 +110,14 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        fetchedResultsController?.managedObjectContext.delete(fetchedResultsController?.object(at: indexPath) as! NSManagedObject)
+        let photo = fetchedResultsController?.object(at: indexPath)
+        fetchedResultsController?.managedObjectContext.delete(photo as! Photo)
     }
+    
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-       // deletedPhotosIndexPaths = [IndexPath]()
+        // deletedPhotosIndexPaths = [IndexPath]()
     }
+    
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         if type == .insert {
             print("insert@\(indexPath)")
@@ -234,16 +236,6 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
         return (sectionData?.numberOfObjects)!
     }
     
-//    func deletePhoto() {
-//        var photo = [Photo]()
-//        for index in deletedPhotosIndexPaths {
-//            photo.append(fetchedResultsController?.object(at: index) as! Photo)
-//        }
-//        for photo in photo {
-//            fetchedResultsController?.managedObjectContext.delete(photo)
-//        }
-//    }
-    
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         let reuseId = "pin"
         var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
@@ -269,7 +261,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
         cell.photoImageView.image = #imageLiteral(resourceName: "placeholder")
         
         let photo = fetchedResultsController?.object(at: indexPath) as! Photo
-        //deleteAllPhotosIndexPaths.append(indexPath)
+        deleteAllPhotosIndexPaths.append(indexPath)
         if photo.imageData != nil {
             cell.photoImageView.image = UIImage(data: photo.imageData! as Data)
             cell.photoActivityIndicator.stopAnimating()

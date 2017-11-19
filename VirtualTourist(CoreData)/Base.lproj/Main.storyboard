@@ -132,7 +132,6 @@
                                             <constraint firstItem="7qf-yh-HUO" firstAttribute="top" secondItem="R4a-B2-4Pa" secondAttribute="top" id="yXy-Ee-McF"/>
                                         </constraints>
                                         <connections>
-                                            <outlet property="collectionViewFlowLayout" destination="Sqt-2J-xjy" id="8rb-cU-J97"/>
                                             <outlet property="photoActivityIndicator" destination="zHY-yT-cdP" id="rQi-3i-YeD"/>
                                             <outlet property="photoImageView" destination="7qf-yh-HUO" id="Rzy-Vo-gYV"/>
                                         </connections>
@@ -158,14 +157,13 @@
                             <constraint firstItem="RxC-TQ-Cor" firstAttribute="trailing" secondItem="zv1-q9-c0X" secondAttribute="trailing" id="s8T-u4-r0Y"/>
                         </constraints>
                     </view>
+                    <extendedEdge key="edgesForExtendedLayout"/>
                     <connections>
                         <outlet property="backButton" destination="pFc-Yl-Cmj" id="FfU-WQ-8JR"/>
-                        <outlet property="collectionViewFlowLayout" destination="Sqt-2J-xjy" id="OI3-3F-uGN"/>
                         <outlet property="deleteButton" destination="QUp-bf-nbC" id="Svm-Wj-Qiv"/>
                         <outlet property="mapView" destination="zv1-q9-c0X" id="hrJ-QX-lci"/>
                         <outlet property="noPhotosView" destination="O2i-In-7vC" id="fKk-a0-AFc"/>
                         <outlet property="photoCollectionView" destination="Taa-M5-Vd8" id="feT-oa-X4a"/>
-                        <outlet property="photoCollectionViewFlowLayout" destination="Sqt-2J-xjy" id="9hX-S7-otL"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Pnj-Zp-BWI" userLabel="First Responder" sceneMemberID="firstResponder"/>
