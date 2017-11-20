@@ -24,8 +24,8 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     var shouldReloadCollectionView = Bool()
     var deletedIndexes = [IndexPath]()
-    var deleteAllPhotosIndexPaths = [IndexPath]()
     var blockOperations = [BlockOperation]()
+    var deleteAllBool = Bool()
     
     
     var fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult>? {
@@ -92,21 +92,23 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     
     @IBAction func deletePhotos(_ sender: Any) {
         var deletePhotos = [Photo]()
-        for index in deleteAllPhotosIndexPaths {
+        deleteAllBool = true
+        var indexsToDelete = [IndexPath]()
+        for section in 0..<photoCollectionView.numberOfSections {
+            for index in 0..<photoCollectionView.numberOfItems(inSection: section) {
+                indexsToDelete.append(IndexPath(item: index, section: section))
+            }
+        }
+        
+        print(indexsToDelete.count)
+        print(fetchedResultsController?.fetchedObjects?.count)
+        
+        for index in indexsToDelete {
             deletePhotos.append(fetchedResultsController?.object(at: index) as! Photo)
         }
         for photo in deletePhotos {
             fetchedResultsController?.managedObjectContext.delete(photo)
         }
-        FlickrClient.sharedInstance().getPhotosFromFlickr(lat: Float(mapView.annotations[0].coordinate.latitude), lon: Float(mapView.annotations[0].coordinate.longitude)) { (success, error) in
-            if success != true {
-                print(error)
-            }else {
-                try! self.fetchedResultsController?.performFetch()
-                self.photoCollectionView.reloadData()
-            }
-        }
-        
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -115,7 +117,6 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     }
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        // deletedPhotosIndexPaths = [IndexPath]()
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -125,105 +126,121 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
                 if photoCollectionView.numberOfItems(inSection: newIndexPath!.section) == 0 {
                     self.shouldReloadCollectionView = true
                 }else {
-                    blockOperations.append(
-                        BlockOperation(block: { [weak self] in
-                            if let this = self {
-                                DispatchQueue.main.async {
+                    if deleteAllBool == true {
+                        blockOperations.append(
+                            BlockOperation(block: { [weak self] in
+                                if let this = self {
                                     this.photoCollectionView.insertItems(at: [indexPath!])
                                 }
-                            }
-                            
-                        })
-                    )
+                                
+                            })
+                        )
+                    }else {
+                        self.photoCollectionView.insertItems(at: [indexPath!])
+                    }
                 }
             } else {
                 self.shouldReloadCollectionView = true
             }
+            
         }
         else if type == .move {
             print("moveItem@\(indexPath)")
-            blockOperations.append(BlockOperation(block: { [weak self] in
-                if let this = self {
-                    DispatchQueue.main.async {
-                        this.photoCollectionView.moveItem(at: indexPath!, to: newIndexPath!)
-                    }
-                }
-                
-            }))
+            //blockOperations.append(BlockOperation(block: { [weak self] in
+            //  if let this = self {
+            //    DispatchQueue.main.async {
+            self.photoCollectionView.moveItem(at: indexPath!, to: newIndexPath!)
+            // }
+            //}
+            
+            //}))
         }
         else if type == .update {
             print("updateItem@\(indexPath)")
-            blockOperations.append(BlockOperation(block: { [weak self] in
-                if let this = self {
-                    DispatchQueue.main.async {
-                        this.photoCollectionView.reloadItems(at: [indexPath!])
-                    }
-                }
-                
-            }))
+            //blockOperations.append(BlockOperation(block: { [weak self] in
+            //  if let this = self {
+            //    DispatchQueue.main.async {
+            self.photoCollectionView.reloadItems(at: [indexPath!])
+            //}
+            //}
+            
+            //}))
         }
         else if type == .delete {
             print("deleteItem@\(indexPath)")
             if photoCollectionView.numberOfItems(inSection: (indexPath?.section)!) == 1 {
                 self.shouldReloadCollectionView = true
             }else {
-                blockOperations.append(BlockOperation(block: { [weak self] in
-                    if let this = self {
-                        DispatchQueue.main.async {
+                if deleteAllBool == true {
+                    blockOperations.append(BlockOperation(block: { [weak self] in
+                        if let this = self {
+                            //DispatchQueue.main.async {
                             this.photoCollectionView.deleteItems(at: [indexPath!])
+                            //}
                         }
-                    }
-                }))
+                    }))
+                }else {
+                    self.photoCollectionView.deleteItems(at: [indexPath!])
+                    
+                }
             }
         }
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
         if type == .insert {
-            blockOperations.append(BlockOperation(block: { [weak self] in
-                if let this = self {
-                    DispatchQueue.main.async {
-                        this.photoCollectionView.insertSections(NSIndexSet(index: sectionIndex) as IndexSet)
-                    }
-                }
-            }))
+            //blockOperations.append(BlockOperation(block: { [weak self] in
+            // if let this = self {
+            //   DispatchQueue.main.async {
+            self.photoCollectionView.insertSections(NSIndexSet(index: sectionIndex) as IndexSet)
+            // }
+            //}
+            //}))
         }
         else if type == .update {
-            blockOperations.append(BlockOperation(block: { [weak self] in
-                if let this  = self {
-                    DispatchQueue.main.async {
-                        this.photoCollectionView.reloadSections(NSIndexSet(index: sectionIndex) as IndexSet)
-                    }
-                }
-            }))
+            //            blockOperations.append(BlockOperation(block: { [weak self] in
+            //                if let this  = self {
+            //                    DispatchQueue.main.async {
+            self.photoCollectionView.reloadSections(NSIndexSet(index: sectionIndex) as IndexSet)
+            //                    }
+            //                }
+            //            }))
         }
         else if type == .delete {
-            blockOperations.append(BlockOperation(block: { [weak self] in
-                if let this = self {
-                    DispatchQueue.main.async {
-                        this.photoCollectionView.deleteSections(NSIndexSet(index: sectionIndex)as IndexSet)
-                    }
-                }
-            }))
+            //            blockOperations.append(BlockOperation(block: { [weak self] in
+            //                if let this = self {
+            //DispatchQueue.main.async {
+            self.photoCollectionView.deleteSections(NSIndexSet(index: sectionIndex)as IndexSet)
+            //}
+            //                }
+            //            }))
         }
     }
     
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         if self.shouldReloadCollectionView == true {
-            DispatchQueue.main.async {
-                self.photoCollectionView.reloadData()
-            }
+            //DispatchQueue.main.async {
+            self.photoCollectionView.reloadData()
+            //}
         }else {
-            DispatchQueue.main.async {
-                self.photoCollectionView.performBatchUpdates({ () -> Void in
-                    for operation: BlockOperation in self.blockOperations {
-                        operation.start()
+            self.photoCollectionView.performBatchUpdates({ () -> Void in
+                for operation: BlockOperation in self.blockOperations {
+                    operation.start()
+                }
+            }, completion: {(finished) -> Void in
+                self.blockOperations.removeAll(keepingCapacity: false)
+                if self.photoCollectionView.numberOfItems(inSection: 0) < 1 {
+                    FlickrClient.sharedInstance().getPhotosFromFlickr(lat: Float(self.mapView.annotations[0].coordinate.latitude), lon: Float(self.mapView.annotations[0].coordinate.longitude)) { (success, error) in
+                        if success != true {
+                            print(error)
+                        }else {
+                            //try! self.fetchedResultsController?.performFetch()
+                            //self.photoCollectionView.reloadData()
+                        }
                     }
-                }, completion: {(finished) -> Void in
-                    self.blockOperations.removeAll(keepingCapacity: false)
-                })
-            }
+                }
+            })
         }
     }
     
@@ -261,7 +278,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
         cell.photoImageView.image = #imageLiteral(resourceName: "placeholder")
         
         let photo = fetchedResultsController?.object(at: indexPath) as! Photo
-        deleteAllPhotosIndexPaths.append(indexPath)
+        
         if photo.imageData != nil {
             cell.photoImageView.image = UIImage(data: photo.imageData! as Data)
             cell.photoActivityIndicator.stopAnimating()
