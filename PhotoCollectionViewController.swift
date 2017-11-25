@@ -42,6 +42,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
         
         return size
     }
+    
     override func viewDidLoad() {
         noPhotosView.isHidden = true
         super.viewDidLoad()
@@ -299,19 +300,13 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
             cell.photoActivityIndicator.stopAnimating()
             
         }else {
-            DispatchQueue.main.async {
-                let session = URLSession.shared
-                let request = URLRequest(url: URL(string: photo.imageURL!)!)
-                let task = session.dataTask(with: request) { (data, response, error) in
-                    if error != nil {
-                        print(error)
-                    }else {
-                        photo.imageData = data! as NSData
-                        cell.photoImageView.image = UIImage(data: photo.imageData! as Data)
-                        cell.photoActivityIndicator.stopAnimating()
-                    }
+            FlickrClient.sharedInstance().downloadImageDataFromFlickr(urlString: photo.imageURL!, photo: photo) { (success, errorString) in
+                if success != true {
+                    print(errorString)
+                }else {
+                    cell.photoImageView.image = UIImage(data: photo.imageData! as Data)
+                    cell.photoActivityIndicator.stopAnimating()
                 }
-                task.resume()
             }
         }
         return cell

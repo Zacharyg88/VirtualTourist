@@ -32,7 +32,7 @@ class FlickrClient: NSObject {
             Constants.FlickrKeys.method: Constants.FlickerValues.searchMethod,
             Constants.FlickrKeys.noJSONCallback: Constants.FlickerValues.disableJSONCallback,
             Constants.FlickrKeys.perPage: Constants.FlickerValues.perPage,
-            Constants.FlickrKeys.page: getRandomPageNumber(number: 3)
+            Constants.FlickrKeys.page: getRandomPageNumber(number: 10)
         ]
         
         
@@ -99,6 +99,21 @@ class FlickrClient: NSObject {
         }
         task.resume() // two threads
     }
+    
+    func downloadImageDataFromFlickr(urlString: String, photo: Photo, completionHandlerDownloadImageFromFlickr: @escaping (_ success: Bool, _ errorString: String) -> Void) {
+        let session = URLSession.shared
+        let request = URLRequest(url: URL(string: urlString)!)
+        let task = session.dataTask(with: request) { (data, response, error) in
+            if error != nil {
+                completionHandlerDownloadImageFromFlickr(false, "\(error)")
+            }else {
+                photo.imageData = data as NSData?
+            }
+            completionHandlerDownloadImageFromFlickr(true, "")
+        }
+        task.resume()
+    }
+    
     
     func flickrURLFromParameters(_ parameters: [String:AnyObject]) -> URL {
         var components = URLComponents()
