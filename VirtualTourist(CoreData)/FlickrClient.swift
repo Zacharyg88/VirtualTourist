@@ -69,6 +69,8 @@ class FlickrClient: NSObject {
         let task = session.dataTask(with: request) { (data, response, error) in
             if error != nil {
                 print("There was an error! \(error)")
+                completionHandlerForGetImagesFromLocationSearch(false, [])
+                
             }else {
                 var parsedResults = [String: AnyObject]()
                 do{
@@ -76,24 +78,26 @@ class FlickrClient: NSObject {
                 }
                 let photos = parsedResults["photos"] as! [String: AnyObject]
                 let photoArray = photos["photo"] as! [[String: AnyObject]]
-                for photo in photoArray {
-                    self.context.perform {
-                        let farm = String(describing: photo["farm"]!)
-                        let id = photo["id"] as! String
-                        let server = photo["server"] as! String
-                        let secret = photo["secret"] as! String
-                        let photoURL = "https://farm\(farm).staticflickr.com/\(server)/\(id)_\(secret).jpg"
-                        let newPhoto = Photo.init(id: (Double(id))!, imageURL: photoURL, title: photo["title"] as! String, pin: self.currentPin[0] , context: self.context)
-                        
-                        results.append(newPhoto)
+                
+                DispatchQueue.main.async {
+                    for photo in photoArray {
+                      
+                            let farm = String(describing: photo["farm"]!)
+                            let id = photo["id"] as! String
+                            let server = photo["server"] as! String
+                            let secret = photo["secret"] as! String
+                            let photoURL = "https://farm\(farm).staticflickr.com/\(server)/\(id)_\(secret).jpg"
+                            let newPhoto = Photo.init(id: (Double(id))!, imageURL: photoURL, title: photo["title"] as! String, pin: self.currentPin[0] , context: self.context)
+                            results.append(newPhoto)
                     }
+                     (UIApplication.shared.delegate as! AppDelegate).saveContext()
+                    
+                    
                 }
+                completionHandlerForGetImagesFromLocationSearch(true, results)
             }
         }
-        task.resume()
-        
-        completionHandlerForGetImagesFromLocationSearch(true, results)
-        
+        task.resume() // two threads
     }
     
     func flickrURLFromParameters(_ parameters: [String:AnyObject]) -> URL {

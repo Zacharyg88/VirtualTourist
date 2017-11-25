@@ -123,6 +123,7 @@ class mapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
                     print("The Error String  is: \(errorString)")
                 }else {
                     print("success!")
+                    //main queue
                     self.performSegue(withIdentifier: "showCollectionViewController", sender: nil)
                 }
             }

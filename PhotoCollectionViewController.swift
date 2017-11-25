@@ -10,7 +10,7 @@ import UIKit
 import CoreData
 import MapKit
 
-class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, NSFetchedResultsControllerDelegate {
+class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, NSFetchedResultsControllerDelegate, UICollectionViewDelegateFlowLayout {
     
     @IBOutlet weak var mapView:MKMapView!
     @IBOutlet weak var photoCollectionView:UICollectionView!
@@ -22,7 +22,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     var noPhotosBool = Bool()
     var fetchedResults = [Photo]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-    var shouldReloadCollectionView = Bool()
+    var shouldReloadCollectionView = true
     var deletedIndexes = [IndexPath]()
     var blockOperations = [BlockOperation]()
     var deleteAllBool = Bool()
@@ -35,7 +35,13 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
             self.photoCollectionView.reloadData()
         }
     }
-    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let frameWidth = photoCollectionView.frame.width
+        let size = CGSize(width: CGFloat((frameWidth / 3) - 8), height: CGFloat(156))
+        
+        
+        return size
+    }
     override func viewDidLoad() {
         noPhotosView.isHidden = true
         super.viewDidLoad()
@@ -93,6 +99,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     @IBAction func deletePhotos(_ sender: Any) {
         var deletePhotos = [Photo]()
         deleteAllBool = true
+        shouldReloadCollectionView = false
         var indexsToDelete = [IndexPath]()
         for section in 0..<photoCollectionView.numberOfSections {
             for index in 0..<photoCollectionView.numberOfItems(inSection: section) {
@@ -109,11 +116,14 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
         for photo in deletePhotos {
             fetchedResultsController?.managedObjectContext.delete(photo)
         }
+        //save
+        (UIApplication.shared.delegate as! AppDelegate).saveContext()
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let photo = fetchedResultsController?.object(at: indexPath)
         fetchedResultsController?.managedObjectContext.delete(photo as! Photo)
+        (UIApplication.shared.delegate as! AppDelegate).saveContext()
     }
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
@@ -130,13 +140,13 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
                         blockOperations.append(
                             BlockOperation(block: { [weak self] in
                                 if let this = self {
-                                    this.photoCollectionView.insertItems(at: [indexPath!])
+                                    this.photoCollectionView.insertItems(at: [newIndexPath!])
                                 }
                                 
                             })
                         )
                     }else {
-                        self.photoCollectionView.insertItems(at: [indexPath!])
+                        self.photoCollectionView.insertItems(at: [newIndexPath!])
                     }
                 }
             } else {
@@ -168,6 +178,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
         }
         else if type == .delete {
             print("deleteItem@\(indexPath)")
+            // shouldReloadCollectionView = false
             if photoCollectionView.numberOfItems(inSection: (indexPath?.section)!) == 1 {
                 self.shouldReloadCollectionView = true
             }else {
@@ -219,6 +230,9 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        print("controller Did Change Content", self.shouldReloadCollectionView)
+        // self.shouldReloadCollectionView = false
+        
         if self.shouldReloadCollectionView == true {
             //DispatchQueue.main.async {
             self.photoCollectionView.reloadData()
@@ -229,6 +243,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
                     operation.start()
                 }
             }, completion: {(finished) -> Void in
+                self.shouldReloadCollectionView = true
                 self.blockOperations.removeAll(keepingCapacity: false)
                 if self.photoCollectionView.numberOfItems(inSection: 0) < 1 {
                     FlickrClient.sharedInstance().getPhotosFromFlickr(lat: Float(self.mapView.annotations[0].coordinate.latitude), lon: Float(self.mapView.annotations[0].coordinate.longitude)) { (success, error) in
@@ -284,18 +299,20 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
             cell.photoActivityIndicator.stopAnimating()
             
         }else {
-            let session = URLSession.shared
-            let request = URLRequest(url: URL(string: photo.imageURL!)!)
-            let task = session.dataTask(with: request) { (data, response, error) in
-                if error != nil {
-                    print(error)
-                }else {
-                    photo.imageData = data! as NSData
-                    cell.photoImageView.image = UIImage(data: photo.imageData! as Data)
-                    cell.photoActivityIndicator.stopAnimating()
+            DispatchQueue.main.async {
+                let session = URLSession.shared
+                let request = URLRequest(url: URL(string: photo.imageURL!)!)
+                let task = session.dataTask(with: request) { (data, response, error) in
+                    if error != nil {
+                        print(error)
+                    }else {
+                        photo.imageData = data! as NSData
+                        cell.photoImageView.image = UIImage(data: photo.imageData! as Data)
+                        cell.photoActivityIndicator.stopAnimating()
+                    }
                 }
+                task.resume()
             }
-            task.resume()
         }
         return cell
     }
